@@ -59,7 +59,7 @@ struc_bspline[1]=0
 struc_fit[1]=0.3
 struc_quick[1]=0
 struc_seg_priors[1]=1
-struc_rerun[1]=1
+struc_rerun[1]=0
 struc_cleanup[1]=1
 struc_process[1]=ACT
 
@@ -67,7 +67,7 @@ struc_process[1]=ACT
 # 2 GMD
 ###################################################################
 
-gmd_rerun[2]=1
+gmd_rerun[2]=0
 gmd_cleanup[2]=1
 
 ###################################################################
@@ -76,7 +76,7 @@ gmd_cleanup[2]=1
 
 cortcon_gm_val[3]=2
 cortcon_wm_val[3]=3
-cortcon_formulation[3]=orig
+cortcon_formulation[3]=fast
 cortcon_rerun[3]=1
 cortcon_cleanup[3]=1
 
@@ -86,7 +86,7 @@ cortcon_cleanup[3]=1
 
 sulc_gm_val[4]=2
 sulc_wm_val[4]=3
-sulc_rerun[4]=1
+sulc_rerun[4]=0
 sulc_cleanup[4]=0
 
 ###################################################################
@@ -108,7 +108,7 @@ jlf_cleanup[5]=1
 
 roiquant_atlas[6]=miccai
 roiquant_vol[6]=1
-roiquant_rerun[6]=0
+roiquant_rerun[6]=1
 roiquant_cleanup[6]=1
 
 ###################################################################
