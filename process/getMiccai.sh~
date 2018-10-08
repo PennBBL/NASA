@@ -25,13 +25,7 @@ for j in $bb; do
     echo $HEADER > ${TEMP_COHORT}
     echo $LINE>> ${TEMP_COHORT}
 
-    echo ${SNGL} run --cleanenv \
-    -B /data:/home/ebutler/data \
-    ${SIMG} \
-    -c /home/ebutler${TEMP_COHORT} \
-    -d /home/ebutler${DESIGN} \ 
-    -o /home/ebutler${OUTPUT} \
-    -r /home/ebutler/data/jux/BBL/studies/nasa_antartica/rawData/ > xcpRunm_${j}.sh
+    echo ${SNGL} run --cleanenv  -B /data:/home/ebutler/data  ${SIMG} -c /home/ebutler${TEMP_COHORT} -d /home/ebutler${DESIGN} -o /home/ebutler${OUTPUT} -r /home/ebutler/data/jux/BBL/studies/nasa_antartica/rawData/ > xcpRunm_${j}.sh
 
     qsub xcpRunm_${j}.sh
 
