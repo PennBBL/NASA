@@ -1,0 +1,157 @@
+# Source my functions
+source("/home/ebutler/scripts/plotFuncs.R")
+
+# --- Select which type of dataset you are using ---
+#type <- as.string(args[1]) # "cort", "gmd", "vol"
+#year <- as.string(args[2]) # "2015", "2016", "combined"
+
+# Load the data
+if (type == "cort") {
+	nasa_cort <- read.csv("/data/jux/BBL/studies/nasa/processedData/structural/xcpAccel/nasa_cort.csv", header=T)
+	nasa_data <- nasa_cort
+	nasa_vol <- read.csv("/data/jux/BBL/studies/nasa/processedData/structural/xcpAccel/nasa_vol.csv", header=T)
+} else if (type == "gmd") {
+	nasa_gmd <- read.csv("/data/jux/BBL/studies/nasa/processedData/structural/xcpAccel/nasa_gmd.csv", header=T) 
+	nasa_data <- nasa_gmd
+	nasa_vol <- read.csv("/data/jux/BBL/studies/nasa/processedData/structural/xcpAccel/nasa_vol.csv", header=T)
+} else if (type == "vol") {
+	nasa_vol <- read.csv("/data/jux/BBL/studies/nasa/processedData/structural/xcpAccel/nasa_vol.csv", header=T)
+	nasa_data <- nasa_vol
+}
+
+# Load the data --- Containerized pipeline
+
+
+# Filter for just controls --- Containerized pipeline
+
+
+# Filter for just crew --- Containerized pipeline
+
+
+# Filter for crew and controls --- Containerized pipeline
+
+
+# Change "subject_2" to "Time"
+colnames(nasa_data)[colnames(nasa_data)=="subject_2"] <- "Time"
+
+# Create wo labels
+wo2015_vec <- c(grep("concordia_0", nasa_data[,"subject_1"]), grep("DLR_0", nasa_data[,"subject_1"]))
+nasa_data$winterover <- NA
+num_rows = nrow(nasa_data)
+for (i in 1:num_rows) {
+	if (i %in% wo2015_vec) {
+		nasa_data[i, "winterover"] <- "wo_2015"
+	} else {
+		nasa_data[i, "winterover"] <- "wo_2016"
+	}
+}
+
+# Call plotFuncs.R functions
+if (type == "cort") {
+	nasa_data <- averageLeftAndRight_WeightByVol(nasa_vol, nasa_data, otherString="anatomical_corticalThickness_mean_")
+} else if (type == "gmd") {
+	nasa_data <- averageLeftAndRight_WeightByVol(nasa_vol, nasa_data, otherString="anatomical_gmd_mean_")
+} else if (type == "vol") {
+	nasa_data <- averageLeftAndRight_Vol(nasa_data, "_R_", "_L_", "_ave_")
+}
+DVColumnNums <- grep("_ave_", colnames(nasa_data))
+IVColumnNums <- c()
+nasa_data <- regressMultDVs(nasa_data, DVColumnNums, IVColumnNums)
+ROIlist <- grep("_zscore", colnames(nasa_data), value=TRUE)
+if (type == "cort") {
+	ROI_ListofLists <- roiLobes(ROIlist, lobeDef=FALSE)
+	ROI_ListofLists$BasGang <- NULL
+	ROI_ListofLists$Limbic <- NULL
+} else if (type == "gmd") {
+	ROI_ListofLists <- roiLobes(ROIlist, lobeDef=FALSE)
+} else if (type == "vol") {
+	ROI_ListofLists <- roiLobes(ROIlist, lobeDef=FALSE)
+}
+
+### separate by winter
+# create summaryDF
+factorsList <- c("winterover", "Time")
+if (type == "cort") {
+	summaryDF <- createSummaryDF(nasa_data, factorsList, ROI_ListofLists, pattern1="anatomical_corticalThickness_mean_miccai_ave_") 
+} else if (type == "gmd") {
+	summaryDF <- createSummaryDF(nasa_data, factorsList, ROI_ListofLists, pattern1="anatomical_gmd_mean_miccai_ave_") 
+} else if (type == "vol") {
+	summaryDF <- createSummaryDF(nasa_data, factorsList, ROI_ListofLists) 
+}
+
+# wo_2015 plot
+if (year == "2015") {
+	wo_2015_data <- summaryDF[which(summaryDF$winterover == "wo_2015"), ]
+	if (type == "cort") {
+		pdf(file = "/home/ebutler/nasa_plots/cort_2015.pdf", width=12, height=8)
+		plot_wo_2015 <- createGGPlotImage(wo_2015_data, "Time", "Cortical thickness changes during WO 2015", lower_order=-1.3)
+		print(plot_wo_2015)
+		dev.off()
+	} else if (type == "gmd") {
+		pdf(file = "/home/ebutler/nasa_plots/gmd_2015.pdf", width=12, height=8)
+		plot_wo_2015 <- createGGPlotImage(wo_2015_data, "Time", "Gray matter density changes during WO 2015", upper_order=1.1)
+		print(plot_wo_2015)
+		dev.off()
+	} else if (type == "vol") {
+		pdf(file = "/home/ebutler/nasa_plots/vol_2015.pdf", width=12, height=8)
+		plot_wo_2015 <- createGGPlotImage(wo_2015_data, "Time", "Volume changes during WO 2015")
+		print(plot_wo_2015)
+		dev.off()
+	}
+}
+
+# wo_2016 plot
+if (year == "2016") {
+	wo_2016_data <- summaryDF[which(summaryDF$winterover == "wo_2016"), ]
+	if (type == "cort") {
+		pdf(file = "/home/ebutler/nasa_plots/cort_2016.pdf", width=12, height=8)
+		plot_wo_2016 <- createGGPlotImage(wo_2016_data, "Time", "Cortical thickness changes during WO 2016", lower_order=-1.3)
+		print(plot_wo_2016)
+		dev.off()
+	} else if (type == "gmd") {
+		pdf(file = "/home/ebutler/nasa_plots/gmd_2016.pdf", width=12, height=8)
+		plot_wo_2016 <- createGGPlotImage(wo_2016_data, "Time", "Gray matter density changes during WO 2016")
+		print(plot_wo_2016)
+		dev.off()
+	} else if (type == "vol") {
+		pdf(file = "/home/ebutler/nasa_plots/vol_2016.pdf", width=12, height=8)
+		plot_wo_2016 <- createGGPlotImage(wo_2016_data, "Time", "Volume changes during WO 2016")
+		print(plot_wo_2016)
+		dev.off()
+	}
+}
+
+### combined
+# create summaryDF
+factorsList <- c("Time")
+if (type == "cort") {
+	comb_summaryDF <- createSummaryDF(nasa_data, factorsList, ROI_ListofLists, pattern1="anatomical_corticalThickness_mean_miccai_ave_") 
+} else if (type == "gmd") {
+	comb_summaryDF <- createSummaryDF(nasa_data, factorsList, ROI_ListofLists, pattern1="anatomical_gmd_mean_miccai_ave_") 
+} else if (type == "vol") {
+	comb_summaryDF <- createSummaryDF(nasa_data, factorsList, ROI_ListofLists) 
+}
+
+# combined plot
+if (year == "combined") {
+	if (type == "cort") {
+		pdf(file = "/home/ebutler/nasa_plots/cort_combined.pdf", width=12, height=8)
+		plot_combined <- createGGPlotImage(comb_summaryDF, "Time", "Cortical thickness changes over WO 2015 & 2016")
+		print(plot_combined)
+		dev.off()
+	} else if (type == "gmd") {
+		pdf(file = "/home/ebutler/nasa_plots/gmd_combined.pdf", width=12, height=8)
+		plot_combined <- createGGPlotImage(comb_summaryDF, "Time", "Gray matter density changes over WO 2015 & 2016", upper_order=1.3)
+		print(plot_combined)
+		dev.off()
+	} else if (type == "vol") {
+		pdf(file = "/home/ebutler/nasa_plots/vol_combined.pdf", width=12, height=8)
+		plot_combined <- createGGPlotImage(comb_summaryDF, "Time", "Volume changes over WO 2015 & 2016")
+		print(plot_combined)
+		dev.off()
+	}
+}
+
+
+
+
