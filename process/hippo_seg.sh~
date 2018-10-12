@@ -19,7 +19,7 @@ for i in `seq 1 143`;
 	winter=`echo $T1_image | cut -d '/' -f 8` ;
 	subj=`echo $T1_image | cut -d '/' -f 9` ; 
 	time=`echo $T1_image | cut -d '/' -f 10` ;
-	processed_dir=/data/jux/BBL/studies/nasa_antartica/processedData/hippocampus
+	processed_dir=/data/joy/BBL/studies/nasa_antartica/processedData/hippocampus
 	if [ ! -e $processed_dir/$winter/ ] ; 
 		mkdir $processed_dir/$winter/ ;
 	fi
@@ -31,21 +31,24 @@ for i in `seq 1 143`;
 	fi	
 
 	output_dir=$processed_dir/$winter/$subj/$time/ ; 
+	# ---get images off of CHEAD onto workspace of itk snap on local machine---
+
+	
 
 	# ---add images to workspace---
 	itksnap-wt -layers-set-main $T2_image -tags-add T2_MRI \ 
 		-laters-add-anat $T1_image -tags-add T1-MRI \
 		-layers-list -o $output_dir/hipp_seg
 
-	# ---send workspace to cloud---
+	# ---send workspace to cloud--- #ERB: Adapt for local machine
 	#ERB: Find services manually... get number using "itksnap-wt -dss-services-list"... use Princeton Young Adult Atlas... figure out if the service code is stable over time
 	service_code=`itksnap-wt -dss-services-list | `
-	itksnap-wt -i $output_dir/hipp_seg -dss-tickets-create $service_code
+	/data/picsl/pauly/bin/itksnap-wt -i $output_dir/hipp_seg -dss-tickets-create $service_code
 	
 done
 
 
 # Questions...ish
-# 1) May not be able to use the cloud version, given the number of jobs
-# 2) On own computer?... On CHEAD... how change command? Should probably use qsub
+# 1) Cannot run on cloud
+# 2) How can I run this script from Chead and have the jobs submitted to my local machine? And have the output put back on Chead?
 # 3) Why do I have to download the result?
