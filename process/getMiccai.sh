@@ -10,7 +10,7 @@ num=$(expr $NJOBS - 1);
 SNGL=/share/apps/singularity/2.5.1/bin/singularity
 SIMG=/data/joy/BBL/applications/bids_apps/xcpEngine-struc.simg
 DESIGN=/data/jux/BBL/projects/nasa_antartica/xcpdocker/design/miccaidocker.dsn
-OUTPUT=/data/joy/BBL/studies/nasa_antartica/processedData/structural_containerized/xcpAccel/ # changed output to joy
+OUTPUT=/data/joy/BBL/studies/nasa_antartica/processedData/structural_containerized/xcpAccel_longJLF/ # changed output to joy
 
 
 
