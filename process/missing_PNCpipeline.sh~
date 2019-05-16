@@ -1,0 +1,19 @@
+### This script finds all of the subjects from the PNC pipeline who have
+###
+### Ellyn Butler
+### January 16, 2018
+
+
+miccaisegs=`find /data/joy/BBL/studies/nasa_antartica/processedData/structural_containerized/xcpAccel_longJLF_OldAnts/*/*/*/roiquant/miccai/* -name "*_corticalThickness.csv"`
+qcanatimg=`find /data/joy/BBL/studies/nasa_antartica/processedData/structural_containerized/xcpAccel_longJLF_OldAnts/*/*/*/qcanat -name "*cortexMask.nii.gz"`
+
+miccainames=`for segimg in $miccaisegs ; do subject="$(echo $segimg | cut -d '/' -f 11)" ; Time="$(echo $segimg | cut -d '/' -f 12)" ; name="${subject}_${Time}" ; echo $name ; done`
+
+firstnames=`for firstname in $firstimg ; do subject="$(echo $firstname | cut -d '/' -f 11)" ; Time="$(echo $firstname | cut -d '/' -f 12)" ; name="${subject}_${Time}" ; echo $name ; done`
+
+allnames="${miccainames} ${firstnames}"
+
+#have to echo
+
+missingnames=`sort /home/ebutler/PNCpipe_miccaivssomething.csv | uniq -u`
+

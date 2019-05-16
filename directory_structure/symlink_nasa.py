@@ -43,7 +43,7 @@ for i in range(len(contents)):
 # Create list that will store (source, dest)
 files_to_link = []
 
-# Get the basename for every file in "files_DWI"... does noto include "/" at end
+# Get the basename for every file in "files_DWI"... does not include "/" at end
 paths = []
 files_bvec = []
 files_bval = []

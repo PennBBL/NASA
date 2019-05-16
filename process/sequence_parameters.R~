@@ -1,0 +1,787 @@
+### This script summarizes the sequence parameters for T1's, T2's and DTI
+### 
+### Ellyn Butler
+### December 12, 2018
+
+# Source my functions
+source("/home/ebutler/scripts/ButlerPlotFuncs/plotFuncs.R")
+
+# Load my data
+nasa_data <- read.csv("/home/ebutler/erb_data/nasa/butellyn_12_21_2018_11_0_2.csv", header=T)
+
+# Rename identification columns
+names(nasa_data)[names(nasa_data) == "MR.ID"] <- "scanid"
+names(nasa_data)[names(nasa_data) == "Subject"] <- "bblid"
+
+# Put in usual identifiers
+nasa_data <- bblidscan_NASAAntartica(nasa_data)
+nasa_data <- scanningSite_NASAAntartica(nasa_data)
+
+#### Take out duplicates
+# Take out row 1557 (hippocampus that we didn't use for PK), 466 double for DTI
+# 183: wo_2015, concordia_006, t12, Crew, CHR (imageScan_ID = 10... duplicate scan)
+a <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_006" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 10),]))
+# 466: wo_2016, concordia_101, t12, Crew, CHR (imageScan_ID = 16... duplicate scan)
+b <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_101" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 16),]))
+# 1323: wo_2016, DLR_107, t12, Control, CGN (imageScan_ID = 5... duplicate scan)
+c <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_107" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 5),]))
+# 1336: wo_2016, DLR_107, t18, Control, CGN (imageScan_ID = 7... duplicate scan)
+d <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_107" & nasa_data$Time == "t18" & nasa_data$imageScan_ID == 7),]))
+# 1427: wo_2016, DLR_111, t18, Control, CGN (imageScan_ID = 7... duplicate scan)
+e <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_111" & nasa_data$Time == "t18" & nasa_data$imageScan_ID == 7),]))
+# 1584: phantoms, PK, t2, Phantoms, CHR (imageScan_ID = 11... duplicate scan)
+f <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "PK" & nasa_data$Time == "t2" & nasa_data$imageScan_ID == 11),]))
+# 314: wo_2015, concordia_010, t12, Crew, CHR (imageScan_ID = 12... duplicate scan)
+g <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_010" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 12),]))
+# 465: wo_2016, concordia_101, t12, Crew, CHR (imageScan_ID = 15... duplicate scan)
+h <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_101" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 15),]))
+# 516: wo_2016, concordia_103, t12, Crew, CHR (imageScan_ID = 11... duplicate scan)
+i <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_103" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 11),]))
+# 575: wo_2016, concordia_105, t12, Crew, CHR (imageScan_ID = 10... duplicate scan)
+j <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_105" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 10),]))
+# 623: wo_2016, concordia_107, t12, Crew, CHR (imageScan_ID = 10... duplicate scan)
+k <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_107" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 10),]))
+# 649: wo_2016, concordia_108, t12, Crew, CHR (imageScan_ID = 10... duplicate scan)
+l <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_108" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 10),]))
+# 775: wo_2016, concordia_112, t12, Crew, CHR (imageScan_ID = 12... duplicate scan)
+m <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_112" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 12),]))
+# 1649: phantoms, BM, t3, Phantom, HOB (imageScan_ID = 6... duplicate scan)
+n <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "BM" & nasa_data$Time == "t3" & nasa_data$imageScan_ID == 6),]))
+# 298: wo_2015, concordia_009, t12, Crew (imageScan_ID = 7... duplicate scan)
+o <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_009" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 7),]))
+# 322: wo_2015, concordia_010, t12, Crew (imageScan_ID = 13... duplicate scan)
+p <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_010" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 13),]))
+# 1347: wo_2015, DLR_013, t12, Control, CGN (imageScan_ID = 8... duplicate scan)
+q <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_013" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 8),]))
+# 808: wo_2016, concordia_112, t18, Crew, CGN (imageScan_ID = 15... duplicate scan)
+r <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_112" & nasa_data$Time == "t18" & nasa_data$imageScan_ID == 15),]))
+# 727: wo_2016, concordia_110, t12, Crew, HOB (imageScan_ID = 12... duplicate scan)
+s <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "concordia_110" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 12),]))
+# 831: wo_2015, DLR_001, t0, Control, CGN (imageScan_ID = 22... duplicate scan)
+t <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_001" & nasa_data$Time == "t0" & nasa_data$imageScan_ID == 22),]))
+# 945: wo_2015, DLR_004, t18, Control, CGN (imageScan_ID = 21... duplicate scan)
+u <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_004" & nasa_data$Time == "t18" & nasa_data$imageScan_ID == 21),]))
+# 1001: wo_2015, DLR_005, t18, Control, CGN (imageScan_ID = 22... duplicate scan)
+v <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_005" & nasa_data$Time == "t18" & nasa_data$imageScan_ID == 22),]))
+# 1267: wo_2015, DLR_011, t18, Control, CGN (imageScan_ID = 21... duplicate scan)
+w <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_011" & nasa_data$Time == "t18" & nasa_data$imageScan_ID == 21),]))
+# 1471: wo_2016, DLR_103, t0, Control, CGN (imageScan_ID = 21... duplicate scan)
+x <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_103" & nasa_data$Time == "t0" & nasa_data$imageScan_ID == 21),]))
+# 1488: wo_2016, DLR_103, t12, Control, CGN (imageScan_ID = 18... duplicate scan)
+y <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_103" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 18),]))
+# 1661: wo_2016, DLR_107, t0, Control, CGN (imageScan_ID = 23... duplicate scan)
+z <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_107" & nasa_data$Time == "t0" & nasa_data$imageScan_ID == 23),]))
+# 1718: wo_2016, DLR_108, t0, Control, CGN (imageScan_ID = 21... duplicate scan)
+aa <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_108" & nasa_data$Time == "t0" & nasa_data$imageScan_ID == 21),]))
+# 1792: wo_2016, DLR_110, t12, Control, CGN (imageScan_ID = 22... duplicate scan)
+bb <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_110" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 22),]))
+# 1833: wo_2016, DLR_111, t12, Control, CGN (imageScan_ID = 22... duplicate scan)
+cc <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_111" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 22),]))
+# 852: wo_2015, DLR_001, t12, Control, CGN (imageScan_ID = 23... duplicate scan)
+dd <- as.numeric(row.names(nasa_data[which(nasa_data$subject_1 == "DLR_001" & nasa_data$Time == "t12" & nasa_data$imageScan_ID == 23),]))
+
+
+
+
+nasa_data <- nasa_data[-c(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, q, x, y, z, aa, bb, cc, dd),]
+
+
+# Make Protocol into factor
+nasa_data$qluxName <- factor(nasa_data$qluxName)
+
+# change dx and dy to 4 digits and Te to 3
+nasa_data$dx <- round(nasa_data$dx,digits=4)
+nasa_data$dy <- round(nasa_data$dy,digits=4)
+nasa_data$dz <- round(nasa_data$dz,digits=2)
+nasa_data$Te <- round(nasa_data$Te,digits=3)
+
+# -------------------------------- T1 -------------------------------- #
+T1_data <- nasa_data[nasa_data$qluxName == "3D_BRAVO_.9x.9x1mm" | nasa_data$qluxName == "MPRAGE_TI1100" | nasa_data$qluxName == "MPRAGE_TI1100_p2" | nasa_data$qluxName == "SC_3D_BRAVO_0.8_ISOTROPIC",]
+T1_data <- rbind(T1_data, nasa_data[nasa_data$subject_1 == "concordia_105" & nasa_data$Time == "t12" & nasa_data$qluxName == "SC_3D_BRAVO_.9x.9x1mm",])
+# Filter for bblid, scanid, qluxName, dx, dy, dz, FlipAngle, AcquisitionMatrix, PhaseDirection, Te, Tr
+T1_data <- T1_data[,c("bblid", "scanid", "winterover", "subject_1", "Time", "scanner", "group", "qluxName", "dx", "dy", "dz", "FlipAngle", "AcquisitionMatrix", "PhaseDirection", "Te", "Tr")]
+write.csv(T1_data, file="/home/ebutler/erb_data/nasa/nasa_T1_acparams.csv", row.names=F)
+
+# Set 1 (N = 103)
+T1_set1 <- T1_data[T1_data$dx == 0.9375 & T1_data$dy == 0.9375 & T1_data$dz == 1 & T1_data$FlipAngle == 9 & T1_data$PhaseDirection == "ROW" & T1_data$Te == 3.51 & T1_data$Tr == 1810,]
+
+set1_num_wo2015crewt0 <- nrow(T1_set1[T1_set1$winterover == "wo_2015" & T1_set1$group == "Crew" & T1_set1$Time == "t0",])
+set1_num_wo2016crewt0 <- nrow(T1_set1[T1_set1$winterover == "wo_2016" & T1_set1$group == "Crew" & T1_set1$Time == "t0",])
+set1_num_wo2015crewt12 <- nrow(T1_set1[T1_set1$winterover == "wo_2015" & T1_set1$group == "Crew" & T1_set1$Time == "t12",])
+set1_num_wo2016crewt12 <- nrow(T1_set1[T1_set1$winterover == "wo_2016" & T1_set1$group == "Crew" & T1_set1$Time == "t12",])
+set1_num_wo2015crewt18 <- nrow(T1_set1[T1_set1$winterover == "wo_2015" & T1_set1$group == "Crew" & T1_set1$Time == "t18",])
+set1_num_wo2016crewt18 <- nrow(T1_set1[T1_set1$winterover == "wo_2016" & T1_set1$group == "Crew" & T1_set1$Time == "t18",])
+
+set1_num_wo2015controlst0 <- nrow(T1_set1[T1_set1$winterover == "wo_2015" & T1_set1$group == "Control" & T1_set1$Time == "t0",])
+set1_num_wo2016controlst0 <- nrow(T1_set1[T1_set1$winterover == "wo_2016" & T1_set1$group == "Control" & T1_set1$Time == "t0",])
+set1_num_wo2015controlst12 <- nrow(T1_set1[T1_set1$winterover == "wo_2015" & T1_set1$group == "Control" & T1_set1$Time == "t12",])
+set1_num_wo2016controlst12 <- nrow(T1_set1[T1_set1$winterover == "wo_2016" & T1_set1$group == "Control" & T1_set1$Time == "t12",])
+set1_num_wo2015controlst18 <- nrow(T1_set1[T1_set1$winterover == "wo_2015" & T1_set1$group == "Control" & T1_set1$Time == "t18",])
+set1_num_wo2016controlst18 <- nrow(T1_set1[T1_set1$winterover == "wo_2016" & T1_set1$group == "Control" & T1_set1$Time == "t18",])
+
+set1_num_phantomst1 <- nrow(T1_set1[T1_set1$winterover == "phantoms" & T1_set1$Time == "t1",])
+set1_num_phantomst2 <- nrow(T1_set1[T1_set1$winterover == "phantoms" & T1_set1$Time == "t2",])
+set1_num_phantomst3 <- nrow(T1_set1[T1_set1$winterover == "phantoms" & T1_set1$Time == "t3",])
+set1_num_phantomst4 <- nrow(T1_set1[T1_set1$winterover == "phantoms" & T1_set1$Time == "t4",])
+
+# Set 2 (N = 32)
+T1_set2 <- T1_data[T1_data$dx == 0.9375 & T1_data$dy == 0.9375 & T1_data$dz == 1 & T1_data$FlipAngle == 9 & T1_data$PhaseDirection == "ROW" & T1_data$Te == 5.228 & T1_data$Tr == 12.856,]
+
+set2_num_wo2015crewt0 <- nrow(T1_set2[T1_set2$winterover == "wo_2015" & T1_set2$group == "Crew" & T1_set2$Time == "t0",])
+set2_num_wo2016crewt0 <- nrow(T1_set2[T1_set2$winterover == "wo_2016" & T1_set2$group == "Crew" & T1_set2$Time == "t0",])
+set2_num_wo2015crewt12 <- nrow(T1_set2[T1_set2$winterover == "wo_2015" & T1_set2$group == "Crew" & T1_set2$Time == "t12",])
+set2_num_wo2016crewt12 <- nrow(T1_set2[T1_set2$winterover == "wo_2016" & T1_set2$group == "Crew" & T1_set2$Time == "t12",])
+set2_num_wo2015crewt18 <- nrow(T1_set2[T1_set2$winterover == "wo_2015" & T1_set2$group == "Crew" & T1_set2$Time == "t18",])
+set2_num_wo2016crewt18 <- nrow(T1_set2[T1_set2$winterover == "wo_2016" & T1_set2$group == "Crew" & T1_set2$Time == "t18",])
+
+set2_num_wo2015controlst0 <- nrow(T1_set2[T1_set2$winterover == "wo_2015" & T1_set2$group == "Control" & T1_set2$Time == "t0",])
+set2_num_wo2016controlst0 <- nrow(T1_set2[T1_set2$winterover == "wo_2016" & T1_set2$group == "Control" & T1_set2$Time == "t0",])
+set2_num_wo2015controlst12 <- nrow(T1_set2[T1_set2$winterover == "wo_2015" & T1_set2$group == "Control" & T1_set2$Time == "t12",])
+set2_num_wo2016controlst12 <- nrow(T1_set2[T1_set2$winterover == "wo_2016" & T1_set2$group == "Control" & T1_set2$Time == "t12",])
+set2_num_wo2015controlst18 <- nrow(T1_set2[T1_set2$winterover == "wo_2015" & T1_set2$group == "Control" & T1_set2$Time == "t18",])
+set2_num_wo2016controlst18 <- nrow(T1_set2[T1_set2$winterover == "wo_2016" & T1_set2$group == "Control" & T1_set2$Time == "t18",])
+
+set2_num_phantomst1 <- nrow(T1_set2[T1_set2$winterover == "phantoms" & T1_set2$Time == "t1",])
+set2_num_phantomst2 <- nrow(T1_set2[T1_set2$winterover == "phantoms" & T1_set2$Time == "t2",])
+set2_num_phantomst3 <- nrow(T1_set2[T1_set2$winterover == "phantoms" & T1_set2$Time == "t3",])
+set2_num_phantomst4 <- nrow(T1_set2[T1_set2$winterover == "phantoms" & T1_set2$Time == "t4",])
+
+# Set 3 (N = 8)
+T1_set3 <- T1_data[T1_data$dx == 0.9375 & T1_data$dy == 0.9375 & T1_data$dz == 1 & T1_data$FlipAngle == 9 & T1_data$PhaseDirection == "ROW" & T1_data$Te == 3.370 & T1_data$Tr == 1810,]
+
+set3_num_wo2015crewt0 <- nrow(T1_set3[T1_set3$winterover == "wo_2015" & T1_set3$group == "Crew" & T1_set3$Time == "t0",])
+set3_num_wo2016crewt0 <- nrow(T1_set3[T1_set3$winterover == "wo_2016" & T1_set3$group == "Crew" & T1_set3$Time == "t0",])
+set3_num_wo2015crewt12 <- nrow(T1_set3[T1_set3$winterover == "wo_2015" & T1_set3$group == "Crew" & T1_set3$Time == "t12",])
+set3_num_wo2016crewt12 <- nrow(T1_set3[T1_set3$winterover == "wo_2016" & T1_set3$group == "Crew" & T1_set3$Time == "t12",])
+set3_num_wo2015crewt18 <- nrow(T1_set3[T1_set3$winterover == "wo_2015" & T1_set3$group == "Crew" & T1_set3$Time == "t18",])
+set3_num_wo2016crewt18 <- nrow(T1_set3[T1_set3$winterover == "wo_2016" & T1_set3$group == "Crew" & T1_set3$Time == "t18",])
+
+set3_num_wo2015controlst0 <- nrow(T1_set3[T1_set3$winterover == "wo_2015" & T1_set3$group == "Control" & T1_set3$Time == "t0",])
+set3_num_wo2016controlst0 <- nrow(T1_set3[T1_set3$winterover == "wo_2016" & T1_set3$group == "Control" & T1_set3$Time == "t0",])
+set3_num_wo2015controlst12 <- nrow(T1_set3[T1_set3$winterover == "wo_2015" & T1_set3$group == "Control" & T1_set3$Time == "t12",])
+set3_num_wo2016controlst12 <- nrow(T1_set3[T1_set3$winterover == "wo_2016" & T1_set3$group == "Control" & T1_set3$Time == "t12",])
+set3_num_wo2015controlst18 <- nrow(T1_set3[T1_set3$winterover == "wo_2015" & T1_set3$group == "Control" & T1_set3$Time == "t18",])
+set3_num_wo2016controlst18 <- nrow(T1_set3[T1_set3$winterover == "wo_2016" & T1_set3$group == "Control" & T1_set3$Time == "t18",])
+
+set3_num_phantomst1 <- nrow(T1_set3[T1_set3$winterover == "phantoms" & T1_set3$Time == "t1",])
+set3_num_phantomst2 <- nrow(T1_set3[T1_set3$winterover == "phantoms" & T1_set3$Time == "t2",])
+set3_num_phantomst3 <- nrow(T1_set3[T1_set3$winterover == "phantoms" & T1_set3$Time == "t3",])
+set3_num_phantomst4 <- nrow(T1_set3[T1_set3$winterover == "phantoms" & T1_set3$Time == "t4",])
+
+# Set 4 (N = 1)
+T1_set4 <- T1_data[T1_data$dx == 0.9375 & T1_data$dy == 0.9375 & T1_data$dz == 1 & T1_data$FlipAngle == 15 & T1_data$PhaseDirection == "ROW" & T1_data$Te == 3.228 & T1_data$Tr == 8.776,]
+
+set4_num_wo2015crewt0 <- nrow(T1_set4[T1_set4$winterover == "wo_2015" & T1_set4$group == "Crew" & T1_set4$Time == "t0",])
+set4_num_wo2016crewt0 <- nrow(T1_set4[T1_set4$winterover == "wo_2016" & T1_set4$group == "Crew" & T1_set4$Time == "t0",])
+set4_num_wo2015crewt12 <- nrow(T1_set4[T1_set4$winterover == "wo_2015" & T1_set4$group == "Crew" & T1_set4$Time == "t12",])
+set4_num_wo2016crewt12 <- nrow(T1_set4[T1_set4$winterover == "wo_2016" & T1_set4$group == "Crew" & T1_set4$Time == "t12",])
+set4_num_wo2015crewt18 <- nrow(T1_set4[T1_set4$winterover == "wo_2015" & T1_set4$group == "Crew" & T1_set4$Time == "t18",])
+set4_num_wo2016crewt18 <- nrow(T1_set4[T1_set4$winterover == "wo_2016" & T1_set4$group == "Crew" & T1_set4$Time == "t18",])
+
+set4_num_wo2015controlst0 <- nrow(T1_set4[T1_set4$winterover == "wo_2015" & T1_set4$group == "Control" & T1_set4$Time == "t0",])
+set4_num_wo2016controlst0 <- nrow(T1_set4[T1_set4$winterover == "wo_2016" & T1_set4$group == "Control" & T1_set4$Time == "t0",])
+set4_num_wo2015controlst12 <- nrow(T1_set4[T1_set4$winterover == "wo_2015" & T1_set4$group == "Control" & T1_set4$Time == "t12",])
+set4_num_wo2016controlst12 <- nrow(T1_set4[T1_set4$winterover == "wo_2016" & T1_set4$group == "Control" & T1_set4$Time == "t12",])
+set4_num_wo2015controlst18 <- nrow(T1_set4[T1_set4$winterover == "wo_2015" & T1_set4$group == "Control" & T1_set4$Time == "t18",])
+set4_num_wo2016controlst18 <- nrow(T1_set4[T1_set4$winterover == "wo_2016" & T1_set4$group == "Control" & T1_set4$Time == "t18",])
+
+set4_num_phantomst1 <- nrow(T1_set4[T1_set4$winterover == "phantoms" & T1_set4$Time == "t1",])
+set4_num_phantomst2 <- nrow(T1_set4[T1_set4$winterover == "phantoms" & T1_set4$Time == "t2",])
+set4_num_phantomst3 <- nrow(T1_set4[T1_set4$winterover == "phantoms" & T1_set4$Time == "t3",])
+set4_num_phantomst4 <- nrow(T1_set4[T1_set4$winterover == "phantoms" & T1_set4$Time == "t4",])
+
+# Set 5 (N = 1)
+T1_set5 <- T1_data[T1_data$dx == 0.9375 & T1_data$dy == 0.9375 & T1_data$dz == 1 & T1_data$FlipAngle == 15 & T1_data$PhaseDirection == "ROW" & T1_data$Te == 3.228 & T1_data$Tr == 8.716,]
+
+set5_num_wo2015crewt0 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Crew" & T1_set5$Time == "t0",])
+set5_num_wo2016crewt0 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Crew" & T1_set5$Time == "t0",])
+set5_num_wo2015crewt12 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Crew" & T1_set5$Time == "t12",])
+set5_num_wo2016crewt12 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Crew" & T1_set5$Time == "t12",])
+set5_num_wo2015crewt18 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Crew" & T1_set5$Time == "t18",])
+set5_num_wo2016crewt18 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Crew" & T1_set5$Time == "t18",])
+
+set5_num_wo2015controlst0 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Control" & T1_set5$Time == "t0",])
+set5_num_wo2016controlst0 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Control" & T1_set5$Time == "t0",])
+set5_num_wo2015controlst12 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Control" & T1_set5$Time == "t12",])
+set5_num_wo2016controlst12 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Control" & T1_set5$Time == "t12",])
+set5_num_wo2015controlst18 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Control" & T1_set5$Time == "t18",])
+set5_num_wo2016controlst18 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Control" & T1_set5$Time == "t18",])
+
+set5_num_phantomst1 <- nrow(T1_set5[T1_set5$winterover == "phantoms" & T1_set5$Time == "t1",])
+set5_num_phantomst2 <- nrow(T1_set5[T1_set5$winterover == "phantoms" & T1_set5$Time == "t2",])
+set5_num_phantomst3 <- nrow(T1_set5[T1_set5$winterover == "phantoms" & T1_set5$Time == "t3",])
+set5_num_phantomst4 <- nrow(T1_set5[T1_set5$winterover == "phantoms" & T1_set5$Time == "t4",])
+
+# Set 6 (N = 1)
+T1_set6 <- T1_data[T1_data$dx == 0.9375 & T1_data$dy == 0.9375 & T1_data$dz == 1 & T1_data$FlipAngle == 9 & T1_data$PhaseDirection == "ROW" & T1_data$Te == 5.296 & T1_data$Tr == 12.976,]
+
+set5_num_wo2015crewt0 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Crew" & T1_set5$Time == "t0",])
+set5_num_wo2016crewt0 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Crew" & T1_set5$Time == "t0",])
+set5_num_wo2015crewt12 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Crew" & T1_set5$Time == "t12",])
+set5_num_wo2016crewt12 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Crew" & T1_set5$Time == "t12",])
+set5_num_wo2015crewt18 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Crew" & T1_set5$Time == "t18",])
+set5_num_wo2016crewt18 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Crew" & T1_set5$Time == "t18",])
+
+set5_num_wo2015controlst0 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Control" & T1_set5$Time == "t0",])
+set5_num_wo2016controlst0 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Control" & T1_set5$Time == "t0",])
+set5_num_wo2015controlst12 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Control" & T1_set5$Time == "t12",])
+set5_num_wo2016controlst12 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Control" & T1_set5$Time == "t12",])
+set5_num_wo2015controlst18 <- nrow(T1_set5[T1_set5$winterover == "wo_2015" & T1_set5$group == "Control" & T1_set5$Time == "t18",])
+set5_num_wo2016controlst18 <- nrow(T1_set5[T1_set5$winterover == "wo_2016" & T1_set5$group == "Control" & T1_set5$Time == "t18",])
+
+set5_num_phantomst1 <- nrow(T1_set5[T1_set5$winterover == "phantoms" & T1_set5$Time == "t1",])
+set5_num_phantomst2 <- nrow(T1_set5[T1_set5$winterover == "phantoms" & T1_set5$Time == "t2",])
+set5_num_phantomst3 <- nrow(T1_set5[T1_set5$winterover == "phantoms" & T1_set5$Time == "t3",])
+set5_num_phantomst4 <- nrow(T1_set5[T1_set5$winterover == "phantoms" & T1_set5$Time == "t4",])
+
+# -------------------------------- T2 -------------------------------- #
+T2_data <- nasa_data[nasa_data$qluxName == "HighResHippo-fov150tr8020_via_DCM_31sl" | nasa_data$qluxName == "HIGH_RES_HIPP_PD" | nasa_data$qluxName == "Cor_(obli)_PD" | nasa_data$qluxName == "AX_PD", ]
+
+# Filter for bblid, scanid, qluxName, dx, dy, dz, FlipAngle, AcquisitionMatrix, PhaseDirection, Te, Tr
+T2_data <- T2_data[,c("bblid", "scanid", "winterover", "subject_1", "Time", "scanner", "group", "qluxName", "dx", "dy", "dz", "FlipAngle", "AcquisitionMatrix", "PhaseDirection", "Te", "Tr")]
+
+# Scan number naming issue for MB t3... info entered manually (DO THIS)... overcame by downloading mid-protocol maker
+df <- data.frame(matrix(NA, nrow = 1, ncol = 17))
+colnames(df) <- c("bblid", "scanid", "winterover", "subject_1", "Time", "scanner", "group", "nVolumes", "qluxName", "dx", "dy", "dz", "FlipAngle", "AcquisitionMatrix", "PhaseDirection", "Te", "Tr")
+df[1,] <- c("Phantom_MB","Phantom_MB_T3","phantoms","BM","t3","HOB","Phantom","HIGH_RES_HIPP_PD",0.293,0.293,2,90,"0\384\384\0","ROW",42.888,8020)
+T2_data <- rbind(T2_data, df)
+
+T2_data$nVolumes <- round(as.numeric(T2_data$nVolumes), digits = 0)
+T2_data$dx <- round(as.numeric(T2_data$dx), digits = 4)
+T2_data$dy <- round(as.numeric(T2_data$dy), digits = 4)
+T2_data$dz <- round(as.numeric(T2_data$dz), digits = 2)
+T2_data$Te <- round(as.numeric(T2_data$Te), digits = 0)
+T2_data$Tr <- round(as.numeric(T2_data$Tr), digits = 0)
+
+
+write.csv(T2_data, file="/home/ebutler/erb_data/nasa/nasa_T2_acparams.csv", row.names=F)
+
+# Set 1 (N = 109)
+T2_set1 <- T2_data[T2_data$dx == 0.3906 & T2_data$dy == 0.3906 & T2_data$dz == 2 & T2_data$FlipAngle == 122 & T2_data$PhaseDirection == "ROW" & T2_data$Te == 48.000 & T2_data$Tr == 8020,]
+
+set1_num_wo2015crewt0 <- nrow(T2_set1[T2_set1$winterover == "wo_2015" & T2_set1$group == "Crew" & T2_set1$Time == "t0",])
+set1_num_wo2016crewt0 <- nrow(T2_set1[T2_set1$winterover == "wo_2016" & T2_set1$group == "Crew" & T2_set1$Time == "t0",])
+set1_num_wo2015crewt12 <- nrow(T2_set1[T2_set1$winterover == "wo_2015" & T2_set1$group == "Crew" & T2_set1$Time == "t12",])
+set1_num_wo2016crewt12 <- nrow(T2_set1[T2_set1$winterover == "wo_2016" & T2_set1$group == "Crew" & T2_set1$Time == "t12",])
+set1_num_wo2015crewt18 <- nrow(T2_set1[T2_set1$winterover == "wo_2015" & T2_set1$group == "Crew" & T2_set1$Time == "t18",])
+set1_num_wo2016crewt18 <- nrow(T2_set1[T2_set1$winterover == "wo_2016" & T2_set1$group == "Crew" & T2_set1$Time == "t18",])
+
+set1_num_wo2015controlst0 <- nrow(T2_set1[T2_set1$winterover == "wo_2015" & T2_set1$group == "Control" & T2_set1$Time == "t0",])
+set1_num_wo2016controlst0 <- nrow(T2_set1[T2_set1$winterover == "wo_2016" & T2_set1$group == "Control" & T2_set1$Time == "t0",])
+set1_num_wo2015controlst12 <- nrow(T2_set1[T2_set1$winterover == "wo_2015" & T2_set1$group == "Control" & T2_set1$Time == "t12",])
+set1_num_wo2016controlst12 <- nrow(T2_set1[T2_set1$winterover == "wo_2016" & T2_set1$group == "Control" & T2_set1$Time == "t12",])
+set1_num_wo2015controlst18 <- nrow(T2_set1[T2_set1$winterover == "wo_2015" & T2_set1$group == "Control" & T2_set1$Time == "t18",])
+set1_num_wo2016controlst18 <- nrow(T2_set1[T2_set1$winterover == "wo_2016" & T2_set1$group == "Control" & T2_set1$Time == "t18",])
+
+set1_num_phantomst1 <- nrow(T2_set1[T2_set1$winterover == "phantoms" & T2_set1$Time == "t1",])
+set1_num_phantomst2 <- nrow(T2_set1[T2_set1$winterover == "phantoms" & T2_set1$Time == "t2",])
+set1_num_phantomst3 <- nrow(T2_set1[T2_set1$winterover == "phantoms" & T2_set1$Time == "t3",])
+set1_num_phantomst4 <- nrow(T2_set1[T2_set1$winterover == "phantoms" & T2_set1$Time == "t4",])
+
+# Set 2 (N = 1)... wo_2015, concordia_001, t12, HOB, Crew
+T2_set2 <- T2_data[T2_data$dx == 0.2930 & T2_data$dy == 0.2930 & T2_data$dz == 2 & T2_data$FlipAngle == 90 & T2_data$PhaseDirection == "ROW" & T2_data$Te == 42.336 & T2_data$Tr == 8020,]
+
+set2_num_wo2015crewt0 <- nrow(T2_set2[T2_set2$winterover == "wo_2015" & T2_set2$group == "Crew" & T2_set2$Time == "t0",])
+set2_num_wo2016crewt0 <- nrow(T2_set2[T2_set2$winterover == "wo_2016" & T2_set2$group == "Crew" & T2_set2$Time == "t0",])
+set2_num_wo2015crewt12 <- nrow(T2_set2[T2_set2$winterover == "wo_2015" & T2_set2$group == "Crew" & T2_set2$Time == "t12",])
+set2_num_wo2016crewt12 <- nrow(T2_set2[T2_set2$winterover == "wo_2016" & T2_set2$group == "Crew" & T2_set2$Time == "t12",])
+set2_num_wo2015crewt18 <- nrow(T2_set2[T2_set2$winterover == "wo_2015" & T2_set2$group == "Crew" & T2_set2$Time == "t18",])
+set2_num_wo2016crewt18 <- nrow(T2_set2[T2_set2$winterover == "wo_2016" & T2_set2$group == "Crew" & T2_set2$Time == "t18",])
+
+set2_num_wo2015controlst0 <- nrow(T2_set2[T2_set1$winterover == "wo_2015" & T2_set2$group == "Control" & T2_set2$Time == "t0",])
+set2_num_wo2016controlst0 <- nrow(T2_set2[T2_set1$winterover == "wo_2016" & T2_set2$group == "Control" & T2_set2$Time == "t0",])
+set2_num_wo2015controlst12 <- nrow(T2_set2[T2_set1$winterover == "wo_2015" & T2_set2$group == "Control" & T2_set2$Time == "t12",])
+set2_num_wo2016controlst12 <- nrow(T2_set2[T2_set1$winterover == "wo_2016" & T2_set2$group == "Control" & T2_set2$Time == "t12",])
+set2_num_wo2015controlst18 <- nrow(T2_set2[T2_set1$winterover == "wo_2015" & T2_set2$group == "Control" & T2_set2$Time == "t18",])
+set2_num_wo2016controlst18 <- nrow(T2_set2[T2_set1$winterover == "wo_2016" & T2_set2$group == "Control" & T2_set2$Time == "t18",])
+
+set2_num_phantomst1 <- nrow(T2_set2[T2_set2$winterover == "phantoms" & T2_set2$Time == "t1",])
+set2_num_phantomst2 <- nrow(T2_set2[T2_set2$winterover == "phantoms" & T2_set2$Time == "t2",])
+set2_num_phantomst3 <- nrow(T2_set2[T2_set2$winterover == "phantoms" & T2_set2$Time == "t3",])
+set2_num_phantomst4 <- nrow(T2_set2[T2_set2$winterover == "phantoms" & T2_set2$Time == "t4",])
+
+# Set 3 (N = 1)... wo_2015, concordia_002, t12, HOB, Crew
+T2_set3 <- T2_data[T2_data$dx == 0.2930 & T2_data$dy == 0.2930 & T2_data$dz == 2 & T2_data$FlipAngle == 90 & T2_data$PhaseDirection == "ROW" & T2_data$Te == 43.608 & T2_data$Tr == 8020,]
+
+# Set 4 (N = 1)... wo_2015, concordia_002, t12, HOB, Crew
+T2_set4 <- T2_data[T2_data$dx == 0.2930 & T2_data$dy == 0.2930 & T2_data$dz == 2 & T2_data$FlipAngle == 90 & T2_data$PhaseDirection == "ROW" & T2_data$Te == 43.608 & T2_data$Tr == 8020,]
+
+# Set 5 (N = 2)... concordia_003, t12 and concordia_112, t12
+T2_set5 <- T2_data[T2_data$dx == 0.2930 & T2_data$dy == 0.2930 & T2_data$dz == 2 & T2_data$FlipAngle == 90 & T2_data$PhaseDirection == "ROW" & T2_data$Te == 42.408 & T2_data$Tr == 8020,]
+
+#... Looks like almost all of the hippocampi have different echo times for t12
+
+# -------------------------------- DTI -------------------------------- #
+DTI_data <- nasa_data[nasa_data$qluxName == "DT1_30+5_2mm_isotropic" | nasa_data$qluxName == "DTI__30+5_2mm_Isotropic" | nasa_data$qluxName == "DTI_30dir_FoV240" | nasa_data$qluxName == "DTI__64+8_2mm_Isotropic" | nasa_data$qluxName == "DTI_64dir_FoV240", ]
+
+# Filter for bblid, scanid, qluxName, dx, dy, dz, FlipAngle, AcquisitionMatrix, PhaseDirection, Te, Tr
+DTI_data <- DTI_data[,c("bblid", "scanid", "winterover", "subject_1", "Time", "scanner", "group", "nVolumes", "qluxName", "dx", "dy", "dz", "FlipAngle", "AcquisitionMatrix", "PhaseDirection", "Te", "Tr")]
+write.csv(DTI_data, file="/home/ebutler/erb_data/nasa/nasa_DTI_acparams.csv", row.names=F)
+
+# Set 1 (N = 40)... Crew and PK at t1
+DTI_set1 <- DTI_data[DTI_data$nVolumes == 31 & DTI_data$dx == 1.8750 & DTI_data$dy == 1.8750 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 90.0 & DTI_data$Tr == 9300,]
+
+set1_num_wo2015crewt0 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2015" & DTI_set1$group == "Crew" & DTI_set1$Time == "t0",])
+set1_num_wo2016crewt0 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2016" & DTI_set1$group == "Crew" & DTI_set1$Time == "t0",])
+set1_num_wo2015crewt12 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2015" & DTI_set1$group == "Crew" & DTI_set1$Time == "t12",])
+set1_num_wo2016crewt12 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2016" & DTI_set1$group == "Crew" & DTI_set1$Time == "t12",])
+set1_num_wo2015crewt18 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2015" & DTI_set1$group == "Crew" & DTI_set1$Time == "t18",])
+set1_num_wo2016crewt18 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2016" & DTI_set1$group == "Crew" & DTI_set1$Time == "t18",])
+
+set1_num_wo2015controlst0 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2015" & DTI_set1$group == "Control" & DTI_set1$Time == "t0",])
+set1_num_wo2016controlst0 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2016" & DTI_set1$group == "Control" & DTI_set1$Time == "t0",])
+set1_num_wo2015controlst12 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2015" & DTI_set1$group == "Control" & DTI_set1$Time == "t12",])
+set1_num_wo2016controlst12 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2016" & DTI_set1$group == "Control" & DTI_set1$Time == "t12",])
+set1_num_wo2015controlst18 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2015" & DTI_set1$group == "Control" & DTI_set1$Time == "t18",])
+set1_num_wo2016controlst18 <- nrow(DTI_set1[DTI_set1$winterover == "wo_2016" & DTI_set1$group == "Control" & DTI_set1$Time == "t18",])
+
+set1_num_phantomst1 <- nrow(DTI_set1[DTI_set1$winterover == "phantoms" & DTI_set1$Time == "t1",])
+set1_num_phantomst2 <- nrow(DTI_set1[DTI_set1$winterover == "phantoms" & DTI_set1$Time == "t2",])
+set1_num_phantomst3 <- nrow(DTI_set1[DTI_set1$winterover == "phantoms" & DTI_set1$Time == "t3",])
+set1_num_phantomst4 <- nrow(DTI_set1[DTI_set1$winterover == "phantoms" & DTI_set1$Time == "t4",])
+
+# Set 2 (N = 71)... Controls, concordia_006 at t18, and phantoms at CGN other than PK t1
+DTI_set2 <- DTI_data[DTI_data$nVolumes == 65 & DTI_data$dx == 1.8750 & DTI_data$dy == 1.8750 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 87 & DTI_data$Tr == 12000,]
+
+set2_num_wo2015crewt0 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Crew" & DTI_set2$Time == "t0",])
+set2_num_wo2016crewt0 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Crew" & DTI_set2$Time == "t0",])
+set2_num_wo2015crewt12 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Crew" & DTI_set2$Time == "t12",])
+set2_num_wo2016crewt12 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Crew" & DTI_set2$Time == "t12",])
+set2_num_wo2015crewt18 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Crew" & DTI_set2$Time == "t18",])
+set2_num_wo2016crewt18 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Crew" & DTI_set2$Time == "t18",])
+
+set2_num_wo2015controlst0 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Control" & DTI_set2$Time == "t0",])
+set2_num_wo2016controlst0 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Control" & DTI_set2$Time == "t0",])
+set2_num_wo2015controlst12 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Control" & DTI_set2$Time == "t12",])
+set2_num_wo2016controlst12 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Control" & DTI_set2$Time == "t12",])
+set2_num_wo2015controlst18 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Control" & DTI_set2$Time == "t18",])
+set2_num_wo2016controlst18 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Control" & DTI_set2$Time == "t18",])
+
+set2_num_phantomst1 <- nrow(DTI_set2[DTI_set2$winterover == "phantoms" & DTI_set2$Time == "t1",])
+set2_num_phantomst2 <- nrow(DTI_set2[DTI_set2$winterover == "phantoms" & DTI_set2$Time == "t2",])
+set2_num_phantomst3 <- nrow(DTI_set2[DTI_set2$winterover == "phantoms" & DTI_set2$Time == "t3",])
+set2_num_phantomst4 <- nrow(DTI_set2[DTI_set2$winterover == "phantoms" & DTI_set2$Time == "t4",])
+
+# Set 3 (N = 1)
+DTI_set3 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 107.3 & DTI_data$Tr == 10300,]
+
+set2_num_wo2015crewt0 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Crew" & DTI_set2$Time == "t0",])
+set2_num_wo2016crewt0 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Crew" & DTI_set2$Time == "t0",])
+set2_num_wo2015crewt12 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Crew" & DTI_set2$Time == "t12",])
+set2_num_wo2016crewt12 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Crew" & DTI_set2$Time == "t12",])
+set2_num_wo2015crewt18 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Crew" & DTI_set2$Time == "t18",])
+set2_num_wo2016crewt18 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Crew" & DTI_set2$Time == "t18",])
+
+set2_num_wo2015controlst0 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Control" & DTI_set2$Time == "t0",])
+set2_num_wo2016controlst0 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Control" & DTI_set2$Time == "t0",])
+set2_num_wo2015controlst12 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Control" & DTI_set2$Time == "t12",])
+set2_num_wo2016controlst12 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Control" & DTI_set2$Time == "t12",])
+set2_num_wo2015controlst18 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2015" & DTI_set2$group == "Control" & DTI_set2$Time == "t18",])
+set2_num_wo2016controlst18 <- nrow(DTI_set2[DTI_set2$winterover == "wo_2016" & DTI_set2$group == "Control" & DTI_set2$Time == "t18",])
+
+set2_num_phantomst1 <- nrow(DTI_set2[DTI_set2$winterover == "phantoms" & DTI_set2$Time == "t1",])
+set2_num_phantomst2 <- nrow(DTI_set2[DTI_set2$winterover == "phantoms" & DTI_set2$Time == "t2",])
+set2_num_phantomst3 <- nrow(DTI_set2[DTI_set2$winterover == "phantoms" & DTI_set2$Time == "t3",])
+set2_num_phantomst4 <- nrow(DTI_set2[DTI_set2$winterover == "phantoms" & DTI_set2$Time == "t4",])
+
+# Set 4 (N = 8)
+DTI_set4 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 110.0 & DTI_data$Tr == 10300,]
+
+# Set 5 (N = 4)
+DTI_set5 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 108.1 & DTI_data$Tr == 10300,]
+
+# Set 6 (N = 10)
+DTI_set6 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 107 & DTI_data$Tr == 10300,]
+
+# Set 7 (N = 3)
+DTI_set7 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 111.2 & DTI_data$Tr == 10300,]
+
+# Set 8 (N = 1)
+DTI_set8 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 110.9 & DTI_data$Tr == 10300,]
+
+# Set 9 (N = 2)
+DTI_set9 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 108.5 & DTI_data$Tr == 10300,]
+
+# Set 10 (N = 1)
+DTI_set10 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 95.6 & DTI_data$Tr == 9300,]
+
+# Set 11 (N = 1)
+DTI_set11 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2.4 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 107 & DTI_data$Tr == 9300,]
+
+# Set 12 (N = 1)
+DTI_set12 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 109.1 & DTI_data$Tr == 10300,]
+
+# Set 13 (N = 1)
+DTI_set13 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 107.4 & DTI_data$Tr == 10300,]
+
+# Set 14 (N = 1)
+DTI_set14 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 108.2 & DTI_data$Tr == 10300,]
+
+# Set 15 (N = 1)
+DTI_set15 <- DTI_data[DTI_data$nVolumes == 35 & DTI_data$dx == 0.9375 & DTI_data$dy == 0.9375 & DTI_data$dz == 2 & DTI_data$FlipAngle == 90 & DTI_data$PhaseDirection == "COL" & DTI_data$Te == 107.8 & DTI_data$Tr == 10300,]
+
+# -------------------------------- Resting BOLD -------------------------------- #
+resting_data <- nasa_data[nasa_data$qluxName == "Resting_BOLD" | nasa_data$qluxName == "Resting_state_fMRI" | nasa_data$qluxName == "Resting_state_fMRI_MUSIC_OFF_CROSS_FIXATION" | nasa_data$qluxName == "Resting_state_fMRI_MUSIC_OFF_CROSS_FIXATION_220FOV",]
+# Chose the longer (> nVolumes) of the Resting BOLDs available to keep... if equal, chose first according to order by imageScan_ID
+
+# Filter for bblid, scanid, qluxName, dx, dy, dz, FlipAngle, AcquisitionMatrix, PhaseDirection, Te, Tr
+resting_data <- resting_data[,c("bblid", "scanid", "winterover", "subject_1", "Time", "scanner", "group", "nVolumes", "qluxName", "dx", "dy", "dz", "FlipAngle", "AcquisitionMatrix", "PhaseDirection", "Te", "Tr")]
+write.csv(resting_data, file="/home/ebutler/erb_data/nasa/nasa_resting_acparams.csv", row.names=F)
+
+# Check for who has all timepoints (N = 42)
+resting_data2 <- filterAllTimepoints(resting_data[resting_data$group != "Phantom",], "subject_1", "Time", 3)
+
+# Set 1 (N = 42)
+resting_set1 <- resting_data[resting_data$nVolumes == 124 & resting_data$dx == 3 & resting_data$dy == 3 & resting_data$dz == 3 & resting_data$FlipAngle == 90 & resting_data$PhaseDirection == "COL" & resting_data$Te == 32 & resting_data$Tr == 3000,]
+
+set1_num_wo2015crewt0 <- nrow(resting_set1[resting_set1$winterover == "wo_2015" & resting_set1$group == "Crew" & resting_set1$Time == "t0",])
+set1_num_wo2016crewt0 <- nrow(resting_set1[resting_set1$winterover == "wo_2016" & resting_set1$group == "Crew" & resting_set1$Time == "t0",])
+set1_num_wo2015crewt12 <- nrow(resting_set1[resting_set1$winterover == "wo_2015" & resting_set1$group == "Crew" & resting_set1$Time == "t12",])
+set1_num_wo2016crewt12 <- nrow(resting_set1[resting_set1$winterover == "wo_2016" & resting_set1$group == "Crew" & resting_set1$Time == "t12",])
+set1_num_wo2015crewt18 <- nrow(resting_set1[resting_set1$winterover == "wo_2015" & resting_set1$group == "Crew" & resting_set1$Time == "t18",])
+set1_num_wo2016crewt18 <- nrow(resting_set1[resting_set1$winterover == "wo_2016" & resting_set1$group == "Crew" & resting_set1$Time == "t18",])
+
+set1_num_wo2015controlst0 <- nrow(resting_set1[resting_set1$winterover == "wo_2015" & resting_set1$group == "Control" & resting_set1$Time == "t0",])
+set1_num_wo2016controlst0 <- nrow(resting_set1[resting_set1$winterover == "wo_2016" & resting_set1$group == "Control" & resting_set1$Time == "t0",])
+set1_num_wo2015controlst12 <- nrow(resting_set1[resting_set1$winterover == "wo_2015" & resting_set1$group == "Control" & resting_set1$Time == "t12",])
+set1_num_wo2016controlst12 <- nrow(resting_set1[resting_set1$winterover == "wo_2016" & resting_set1$group == "Control" & resting_set1$Time == "t12",])
+set1_num_wo2015controlst18 <- nrow(resting_set1[resting_set1$winterover == "wo_2015" & resting_set1$group == "Control" & resting_set1$Time == "t18",])
+set1_num_wo2016controlst18 <- nrow(resting_set1[resting_set1$winterover == "wo_2016" & resting_set1$group == "Control" & resting_set1$Time == "t18",])
+
+set1_num_phantomst1 <- nrow(resting_set1[resting_set1$winterover == "phantoms" & resting_set1$Time == "t1",])
+set1_num_phantomst2 <- nrow(resting_set1[resting_set1$winterover == "phantoms" & resting_set1$Time == "t2",])
+set1_num_phantomst3 <- nrow(resting_set1[resting_set1$winterover == "phantoms" & resting_set1$Time == "t3",])
+set1_num_phantomst4 <- nrow(resting_set1[resting_set1$winterover == "phantoms" & resting_set1$Time == "t4",])
+
+# Set 2 (N = 14)
+resting_set2 <- resting_data[resting_data$nVolumes == 124 & resting_data$dx == 3.75 & resting_data$dy == 3.75 & resting_data$dz == 3 & resting_data$FlipAngle == 90 & resting_data$PhaseDirection == "COL" & resting_data$Te == 30 & resting_data$Tr == 3000,]
+
+set2_num_wo2015crewt0 <- nrow(resting_set2[resting_set2$winterover == "wo_2015" & resting_set2$group == "Crew" & resting_set2$Time == "t0",])
+set2_num_wo2016crewt0 <- nrow(resting_set2[resting_set2$winterover == "wo_2016" & resting_set2$group == "Crew" & resting_set2$Time == "t0",])
+set2_num_wo2015crewt12 <- nrow(resting_set2[resting_set2$winterover == "wo_2015" & resting_set2$group == "Crew" & resting_set2$Time == "t12",])
+set2_num_wo2016crewt12 <- nrow(resting_set2[resting_set2$winterover == "wo_2016" & resting_set2$group == "Crew" & resting_set2$Time == "t12",])
+set2_num_wo2015crewt18 <- nrow(resting_set2[resting_set2$winterover == "wo_2015" & resting_set2$group == "Crew" & resting_set2$Time == "t18",])
+set2_num_wo2016crewt18 <- nrow(resting_set2[resting_set2$winterover == "wo_2016" & resting_set2$group == "Crew" & resting_set2$Time == "t18",])
+
+# Set 3 (N = 9)
+resting_set3 <- resting_data[resting_data$nVolumes == 124 & resting_data$dx == 3 & resting_data$dy == 3 & resting_data$dz == 3 & resting_data$FlipAngle == 90 & resting_data$PhaseDirection == "COL" & resting_data$Te == 28 & resting_data$Tr == 3000,]
+
+# Set 4 (N = 2)
+resting_set4 <- resting_data[resting_data$nVolumes == 124 & resting_data$dx == 3.75 & resting_data$dy == 3.75 & resting_data$dz == 3 & resting_data$FlipAngle == 90 & resting_data$PhaseDirection == "COL" & resting_data$Te == 28 & resting_data$Tr == 3000,]
+
+# Set 5 (N = 2)
+resting_set5 <- resting_data[resting_data$nVolumes == 124 & resting_data$dx == 3.4375 & resting_data$dy == 3.4375 & resting_data$dz == 3 & resting_data$FlipAngle == 90 & resting_data$PhaseDirection == "COL" & resting_data$Te == 26 & resting_data$Tr == 3000,]
+
+# Set 6 (N = 1)
+resting_set6 <- resting_data[resting_data$nVolumes == 144 & resting_data$dx == 3.4375 & resting_data$dy == 3.4375 & resting_data$dz == 3 & resting_data$FlipAngle == 90 & resting_data$PhaseDirection == "COL" & resting_data$Te == 32 & resting_data$Tr == 3000,]
+
+# Set 7 (N = 5)
+resting_set7 <- resting_data[resting_data$nVolumes == 128 & resting_data$dx == 3 & resting_data$dy == 3 & resting_data$dz == 3 & resting_data$FlipAngle == 90 & resting_data$PhaseDirection == "COL" & resting_data$Te == 28 & resting_data$Tr == 3000,]
+
+# Set 8 (N = 1)
+resting_set8 <- resting_data[resting_data$nVolumes == 124 & resting_data$dx == 3.75 & resting_data$dy == 3.75 & resting_data$dz == 3 & resting_data$FlipAngle == 90 & resting_data$PhaseDirection == "COL" & resting_data$Te == 30 & resting_data$Tr == 3246,]
+
+
+# -------------------------------- SVOLT encode -------------------------------- #
+SVOLTencode_data <- nasa_data[nasa_data$qluxName == "FMRI_SVOLT_encode" | nasa_data$qluxName == "pitt1_svolt-e_4.05_064", ]
+SVOLTencode_data <- SVOLTencode_data[!(SVOLTencode_data$nVolumes < 60),]
+# Kosha said to use first encoding scan
+
+# Filter for bblid, scanid, qluxName, dx, dy, dz, FlipAngle, AcquisitionMatrix, PhaseDirection, Te, Tr
+SVOLTencode_data <- SVOLTencode_data[,c("bblid", "scanid", "winterover", "subject_1", "Time", "scanner", "group", "nVolumes", "qluxName", "dx", "dy", "dz", "FlipAngle", "AcquisitionMatrix", "PhaseDirection", "Te", "Tr")]
+
+# Scan number naming issue for MB t3... info entered manually (DO THIS)... overcame by downloading mid-protocol maker
+#df <- data.frame(matrix(NA, nrow = 1, ncol = 17))
+#colnames(df) <- c("bblid", "scanid", "winterover", "subject_1", "Time", "scanner", "group", "nVolumes", "qluxName", "dx", "dy", "dz", "FlipAngle", "AcquisitionMatrix", "PhaseDirection", "Te", "Tr")
+#df[1,] <- c("Phantom_MB", "Phantom_MB_T3", "phantoms", "BM", "t3", "HOB", "Phantom", 124, "FMRI_SVOLT_encode", 3.4375, 3.4375, 3, 70, "64\\0\\0\\64", "COL", 26, 3000)
+#SVOLTencode_data <- rbind(SVOLTencode_data, df)
+
+#SVOLTencode_data$nVolumes <- round(as.numeric(SVOLTencode_data$nVolumes), digits = 0)
+#SVOLTencode_data$dx <- round(as.numeric(SVOLTencode_data$dx), digits = 4)
+#SVOLTencode_data$dy <- round(as.numeric(SVOLTencode_data$dy), digits = 4)
+#SVOLTencode_data$dz <- round(as.numeric(SVOLTencode_data$dz), digits = 2)
+#SVOLTencode_data$Te <- round(as.numeric(SVOLTencode_data$Te), digits = 0)
+#SVOLTencode_data$Tr <- round(as.numeric(SVOLTencode_data$Tr), digits = 0)
+
+write.csv(SVOLTencode_data, file="/home/ebutler/erb_data/nasa/nasa_SVOLTencode_acparams.csv", row.names=F)
+
+# Set 1 (N = 110)
+SVOLTencode_set1 <- SVOLTencode_data[SVOLTencode_data$nVolumes == 64 & SVOLTencode_data$dx == 3.4375 & SVOLTencode_data$dy == 3.4375 & SVOLTencode_data$dz == 3 & SVOLTencode_data$FlipAngle == 70 & SVOLTencode_data$PhaseDirection == "COL" & SVOLTencode_data$Te == 30 & SVOLTencode_data$Tr == 3000,]
+
+set1_num_wo2015crewt0 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2015" & SVOLTencode_set1$group == "Crew" & SVOLTencode_set1$Time == "t0",])
+set1_num_wo2016crewt0 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2016" & SVOLTencode_set1$group == "Crew" & SVOLTencode_set1$Time == "t0",])
+set1_num_wo2015crewt12 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2015" & SVOLTencode_set1$group == "Crew" & SVOLTencode_set1$Time == "t12",])
+set1_num_wo2016crewt12 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2016" & SVOLTencode_set1$group == "Crew" & SVOLTencode_set1$Time == "t12",])
+set1_num_wo2015crewt18 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2015" & SVOLTencode_set1$group == "Crew" & SVOLTencode_set1$Time == "t18",])
+set1_num_wo2016crewt18 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2016" & SVOLTencode_set1$group == "Crew" & SVOLTencode_set1$Time == "t18",])
+
+set1_num_wo2015controlst0 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2015" & SVOLTencode_set1$group == "Control" & SVOLTencode_set1$Time == "t0",])
+set1_num_wo2016controlst0 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2016" & SVOLTencode_set1$group == "Control" & SVOLTencode_set1$Time == "t0",])
+set1_num_wo2015controlst12 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2015" & SVOLTencode_set1$group == "Control" & SVOLTencode_set1$Time == "t12",])
+set1_num_wo2016controlst12 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2016" & SVOLTencode_set1$group == "Control" & SVOLTencode_set1$Time == "t12",])
+set1_num_wo2015controlst18 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2015" & SVOLTencode_set1$group == "Control" & SVOLTencode_set1$Time == "t18",])
+set1_num_wo2016controlst18 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "wo_2016" & SVOLTencode_set1$group == "Control" & SVOLTencode_set1$Time == "t18",])
+
+set1_num_phantomst1 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "phantoms" & SVOLTencode_set1$Time == "t1",])
+set1_num_phantomst2 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "phantoms" & SVOLTencode_set1$Time == "t2",])
+set1_num_phantomst3 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "phantoms" & SVOLTencode_set1$Time == "t3",])
+set1_num_phantomst4 <- nrow(SVOLTencode_set1[SVOLTencode_set1$winterover == "phantoms" & SVOLTencode_set1$Time == "t4",])
+
+# Set 2 (N = 14)
+SVOLTencode_set2 <- SVOLTencode_data[SVOLTencode_data$nVolumes == 60 & SVOLTencode_data$dx == 3.4375 & SVOLTencode_data$dy == 3.4375 & SVOLTencode_data$dz == 3 & SVOLTencode_data$FlipAngle == 70 & SVOLTencode_data$PhaseDirection == "COL" & SVOLTencode_data$Te == 26 & SVOLTencode_data$Tr == 3000,]
+
+# Set 3 (N = 16)
+SVOLTencode_set3 <- SVOLTencode_data[SVOLTencode_data$nVolumes == 64 & SVOLTencode_data$dx == 3.4375 & SVOLTencode_data$dy == 3.4375 & SVOLTencode_data$dz == 3 & SVOLTencode_data$FlipAngle == 70 & SVOLTencode_data$PhaseDirection == "COL" & SVOLTencode_data$Te == 26 & SVOLTencode_data$Tr == 3000,]
+
+# Set 4 (N = 1)
+SVOLTencode_set4 <- SVOLTencode_data[SVOLTencode_data$nVolumes == 124 & SVOLTencode_data$dx == 3.4375 & SVOLTencode_data$dy == 3.4375 & SVOLTencode_data$dz == 3 & SVOLTencode_data$FlipAngle == 70 & SVOLTencode_data$PhaseDirection == "COL" & SVOLTencode_data$Te == 26 & SVOLTencode_data$Tr == 3000,]
+
+# Set 5 (N = 1)
+SVOLTencode_set5 <- SVOLTencode_data[SVOLTencode_data$nVolumes == 64 & SVOLTencode_data$dx == 3.4375 & SVOLTencode_data$dy == 3.4375 & SVOLTencode_data$dz == 4 & SVOLTencode_data$FlipAngle == 70 & SVOLTencode_data$PhaseDirection == "COL" & SVOLTencode_data$Te == 26 & SVOLTencode_data$Tr == 3000,]
+
+# Set 6 (N = 1)
+SVOLTencode_set6 <- SVOLTencode_data[SVOLTencode_data$nVolumes == 60 & SVOLTencode_data$dx == 3.4375 & SVOLTencode_data$dy == 3.4375 & SVOLTencode_data$dz == 3 & SVOLTencode_data$FlipAngle == 70 & SVOLTencode_data$PhaseDirection == "COL" & SVOLTencode_data$Te == 26 & SVOLTencode_data$Tr == 3518,]
+
+
+# -------------------------------- SVOLT recall -------------------------------- #
+SVOLTrecall_data <- nasa_data[nasa_data$qluxName == "FMRI_SVOLT_recall" | nasa_data$qluxName == "pitt1_svolt-r_4.05_083", ]
+SVOLTrecall_data <- SVOLTrecall_data[!(SVOLTrecall_data$nVolumes < 83),]
+
+# Filter for bblid, scanid, qluxName, dx, dy, dz, FlipAngle, AcquisitionMatrix, PhaseDirection, Te, Tr
+SVOLTrecall_data <- SVOLTrecall_data[,c("bblid", "scanid", "winterover", "subject_1", "Time", "scanner", "group", "nVolumes", "qluxName", "dx", "dy", "dz", "FlipAngle", "AcquisitionMatrix", "PhaseDirection", "Te", "Tr")]
+
+write.csv(SVOLTrecall_data, file="/home/ebutler/erb_data/nasa/nasa_SVOLTrecall_acparams.csv", row.names=F)
+
+# Set 1 (N = 110)
+SVOLTrecall_set1 <- SVOLTrecall_data[SVOLTrecall_data$nVolumes == 83 & SVOLTrecall_data$dx == 3.4375 & SVOLTrecall_data$dy == 3.4375 & SVOLTrecall_data$dz == 3 & SVOLTrecall_data$FlipAngle == 70 & SVOLTrecall_data$PhaseDirection == "COL" & SVOLTrecall_data$Te == 30 & SVOLTrecall_data$Tr == 3000,]
+
+set1_num_wo2015crewt0 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2015" & SVOLTrecall_set1$group == "Crew" & SVOLTrecall_set1$Time == "t0",])
+set1_num_wo2016crewt0 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2016" & SVOLTrecall_set1$group == "Crew" & SVOLTrecall_set1$Time == "t0",])
+set1_num_wo2015crewt12 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2015" & SVOLTrecall_set1$group == "Crew" & SVOLTrecall_set1$Time == "t12",])
+set1_num_wo2016crewt12 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2016" & SVOLTrecall_set1$group == "Crew" & SVOLTrecall_set1$Time == "t12",])
+set1_num_wo2015crewt18 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2015" & SVOLTrecall_set1$group == "Crew" & SVOLTrecall_set1$Time == "t18",])
+set1_num_wo2016crewt18 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2016" & SVOLTrecall_set1$group == "Crew" & SVOLTrecall_set1$Time == "t18",])
+
+set1_num_wo2015controlst0 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2015" & SVOLTrecall_set1$group == "Control" & SVOLTrecall_set1$Time == "t0",])
+set1_num_wo2016controlst0 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2016" & SVOLTrecall_set1$group == "Control" & SVOLTrecall_set1$Time == "t0",])
+set1_num_wo2015controlst12 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2015" & SVOLTrecall_set1$group == "Control" & SVOLTrecall_set1$Time == "t12",])
+set1_num_wo2016controlst12 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2016" & SVOLTrecall_set1$group == "Control" & SVOLTrecall_set1$Time == "t12",])
+set1_num_wo2015controlst18 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2015" & SVOLTrecall_set1$group == "Control" & SVOLTrecall_set1$Time == "t18",])
+set1_num_wo2016controlst18 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "wo_2016" & SVOLTrecall_set1$group == "Control" & SVOLTrecall_set1$Time == "t18",])
+
+set1_num_phantomst1 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "phantoms" & SVOLTrecall_set1$Time == "t1",])
+set1_num_phantomst2 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "phantoms" & SVOLTrecall_set1$Time == "t2",])
+set1_num_phantomst3 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "phantoms" & SVOLTrecall_set1$Time == "t3",])
+set1_num_phantomst4 <- nrow(SVOLTrecall_set1[SVOLTrecall_set1$winterover == "phantoms" & SVOLTrecall_set1$Time == "t4",])
+
+# Set 2 (N = 13)
+SVOLTrecall_set2 <- SVOLTrecall_data[SVOLTrecall_data$nVolumes == 124 & SVOLTrecall_data$dx == 3.4375 & SVOLTrecall_data$dy == 3.4375 & SVOLTrecall_data$dz == 3 & SVOLTrecall_data$FlipAngle == 70 & SVOLTrecall_data$PhaseDirection == "COL" & SVOLTrecall_data$Te == 26 & SVOLTrecall_data$Tr == 3000,]
+
+# Set 3 (N = 16)
+SVOLTrecall_set3 <- SVOLTrecall_data[SVOLTrecall_data$nVolumes == 83 & SVOLTrecall_data$dx == 3.4375 & SVOLTrecall_data$dy == 3.4375 & SVOLTrecall_data$dz == 3 & SVOLTrecall_data$FlipAngle == 70 & SVOLTrecall_data$PhaseDirection == "COL" & SVOLTrecall_data$Te == 26 & SVOLTrecall_data$Tr == 3000,]
+
+# Set 4 (N = 1)
+SVOLTrecall_set4 <- SVOLTrecall_data[SVOLTrecall_data$nVolumes == 83 & SVOLTrecall_data$dx == 3.4375 & SVOLTrecall_data$dy == 3.4375 & SVOLTrecall_data$dz == 4 & SVOLTrecall_data$FlipAngle == 70 & SVOLTrecall_data$PhaseDirection == "COL" & SVOLTrecall_data$Te == 26 & SVOLTrecall_data$Tr == 3000,]
+
+# Set 5 (N = 1)
+SVOLTrecall_set5 <- SVOLTrecall_data[SVOLTrecall_data$nVolumes == 124 & SVOLTrecall_data$dx == 3.4375 & SVOLTrecall_data$dy == 3.4375 & SVOLTrecall_data$dz == 3 & SVOLTrecall_data$FlipAngle == 70 & SVOLTrecall_data$PhaseDirection == "COL" & SVOLTrecall_data$Te == 26 & SVOLTrecall_data$Tr == 3445,]
+
+# ------------------------------------------------------------------------------------------------------------------------ #
+# DTI
+DTI_names <- c()
+for (row in 1:nrow(DTI_data)) {
+	name <- paste0(DTI_data[row, "subject_1"], DTI_data[row, "Time"])
+	DTI_names <- c(DTI_names, name)
+}
+
+names_sets <- c()
+for (row in 1:nrow(DTI_set1)) {
+	name <- paste0(DTI_set1[row, "subject_1"], DTI_set1[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set1")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set2)) {
+	name <- paste0(DTI_set2[row, "subject_1"], DTI_set2[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set2")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set3)) {
+	name <- paste0(DTI_set3[row, "subject_1"], DTI_set3[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set3")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set4)) {
+	name <- paste0(DTI_set4[row, "subject_1"], DTI_set4[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set4")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set5)) {
+	name <- paste0(DTI_set5[row, "subject_1"], DTI_set5[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set5")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set6)) {
+	name <- paste0(DTI_set6[row, "subject_1"], DTI_set6[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set6")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set7)) {
+	name <- paste0(DTI_set7[row, "subject_1"], DTI_set7[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set7")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set8)) {
+	name <- paste0(DTI_set8[row, "subject_1"], DTI_set8[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set8")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set9)) {
+	name <- paste0(DTI_set9[row, "subject_1"], DTI_set9[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set9")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set10)) {
+	name <- paste0(DTI_set10[row, "subject_1"], DTI_set10[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set10")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set11)) {
+	name <- paste0(DTI_set11[row, "subject_1"], DTI_set11[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set11")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set12)) {
+	name <- paste0(DTI_set12[row, "subject_1"], DTI_set12[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set12")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set13)) {
+	name <- paste0(DTI_set13[row, "subject_1"], DTI_set13[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set13")
+	}
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(DTI_set14)) {
+	name <- paste0(DTI_set14[row, "subject_1"], DTI_set14[row, "Time"])
+	if (name == "concordia_102t12") {
+		print("DTI_set14")
+	}
+	names_sets <- c(names_sets, name)
+}
+
+# T1
+T1_names <- c()
+for (row in 1:nrow(T1_data)) {
+	name <- paste0(T1_data[row, "subject_1"],T1_data[row, "Time"])
+	T1_names <- c(T1_names, name)
+}
+
+# T2
+T2_names <- c()
+for (row in 1:nrow(T2_data)) {
+	name <- paste0(T2_data[row, "subject_1"],T2_data[row, "Time"])
+	T2_names <- c(T2_names, name)
+}
+
+# Resting
+resting_names <- c()
+for (row in 1:nrow(resting_data)) {
+	name <- paste0(resting_data[row, "subject_1"],resting_data[row, "Time"])
+	resting_names <- c(resting_names, name)
+}
+
+names_sets <- c()
+for (row in 1:nrow(resting_set1)) {
+	name <- paste0(resting_set1[row, "subject_1"], resting_set1[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(resting_set2)) {
+	name <- paste0(resting_set2[row, "subject_1"], resting_set2[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(resting_set3)) {
+	name <- paste0(resting_set3[row, "subject_1"], resting_set3[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(resting_set4)) {
+	name <- paste0(resting_set4[row, "subject_1"], resting_set4[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(resting_set5)) {
+	name <- paste0(resting_set5[row, "subject_1"], resting_set5[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+
+# SVOLT encode
+SVOLTencode_names <- c()
+for (row in 1:nrow(SVOLTencode_data)) {
+	name <- paste0(SVOLTencode_data[row, "subject_1"],SVOLTencode_data[row, "Time"])
+	SVOLTencode_names <- c(SVOLTencode_names, name)
+}
+
+
+names_sets <- c()
+for (row in 1:nrow(SVOLTencode_set1)) {
+	name <- paste0(SVOLTencode_set1[row, "subject_1"], SVOLTencode_set1[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(SVOLTencode_set2)) {
+	name <- paste0(SVOLTencode_set2[row, "subject_1"], SVOLTencode_set2[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(SVOLTencode_set3)) {
+	name <- paste0(SVOLTencode_set3[row, "subject_1"], SVOLTencode_set3[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(resting_set4)) {
+	name <- paste0(SVOLTencode_set4[row, "subject_1"], SVOLTencode_set4[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+
+# SVOLT recall
+SVOLTrecall_names <- c()
+for (row in 1:nrow(SVOLTrecall_data)) {
+	name <- paste0(SVOLTrecall_data[row, "subject_1"],SVOLTrecall_data[row, "Time"])
+	SVOLTrecall_names <- c(SVOLTrecall_names, name)
+}
+
+names_sets <- c()
+for (row in 1:nrow(SVOLTrecall_set1)) {
+	name <- paste0(SVOLTrecall_set1[row, "subject_1"], SVOLTrecall_set1[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(SVOLTrecall_set2)) {
+	name <- paste0(SVOLTrecall_set2[row, "subject_1"], SVOLTrecall_set2[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+for (row in 1:nrow(SVOLTrecall_set3)) {
+	name <- paste0(SVOLTrecall_set3[row, "subject_1"], SVOLTrecall_set3[row, "Time"])
+	names_sets <- c(names_sets, name)
+}
+
+

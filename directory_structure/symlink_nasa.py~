@@ -12,8 +12,8 @@ import re
 import shutil
 from glob import glob
 
-exec(open("/home/ebutler/scripts/nasa/process_directory_symlink_nasa.py"))
-exec(open("/home/ebutler/scripts/nasa/make_links_symlink_nasa.py"))
+exec(open("/home/ebutler/scripts/NASA/directory_structure/process_directory_symlink_nasa.py"))
+exec(open("/home/ebutler/scripts/NASA/directory_structure/make_links_symlink_nasa.py"))
 
 root_dir = "/data/jux/BBL/studies/nasa_antartica"
 bids_dir = root_dir + "/BIDS"
