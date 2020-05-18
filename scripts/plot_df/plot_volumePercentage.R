@@ -51,8 +51,8 @@ nasa_df$Visit <- paste0(nasa_df$scanner, "_", nasa_df$Time)
 phantom_hippo_df <- melt(nasa_df[nasa_df$group == "Phantom",], c("subject_1", "Visit"), hipporegions)
 names(phantom_hippo_df) <- c("Phantom", "Visit", "Region", "PercentBase")
 phantom_hippo_df$PercentBase <- phantom_hippo_df$PercentBase*100
-phantom_hippo_df$Visit <- ordered(phantom_hippo_df$Visit, c("CGN_t1", "CHR_t2",
-  "HOB_t3", "CGN_t4"))
+phantom_hippo_df$Visit <- ordered(phantom_hippo_df$Visit, c("CGN_t1", "CGN_t4",
+ "CHR_t2", "HOB_t3"))
 phantom_hippo_df$Region <- revalue(phantom_hippo_df$Region,
   c("perbase_vol_princeton_ave_CA1"="CA1",
   "perbase_vol_princeton_ave_CA23"="CA23", "perbase_vol_princeton_ave_DG"="DG",
@@ -68,8 +68,8 @@ phantom_hippo_plot <- ggplot(phantom_hippo_df, aes(x=Visit, y=PercentBase, color
 phantom_lobe_df <- melt(nasa_df[nasa_df$group == "Phantom",], c("subject_1", "Visit"), lobularregions)
 names(phantom_lobe_df) <- c("Phantom", "Visit", "Region", "PercentBase")
 phantom_lobe_df$PercentBase <- phantom_lobe_df$PercentBase*100
-phantom_lobe_df$Visit <- ordered(phantom_lobe_df$Visit, c("CGN_t1", "CHR_t2",
-  "HOB_t3", "CGN_t4"))
+phantom_lobe_df$Visit <- ordered(phantom_lobe_df$Visit, c("CGN_t1", "CGN_t4",
+  "CHR_t2", "HOB_t3"))
 phantom_lobe_df$Region <- revalue(phantom_lobe_df$Region,
   c("perbase_BasGang_Vol"="BasGang", "perbase_Limbic_Vol"="Limbic",
   "perbase_FrontOrb_Vol"="FrontOrb", "perbase_FrontDors_Vol"="FrontDors",
