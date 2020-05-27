@@ -2,7 +2,7 @@
 ### for NASA Antarctica subjects... PROBABLY NOT DOABLE GIVEN DIMENSIONS OF IMAGES
 ###
 ### Ellyn Butler
-### April 23, 2019
+### April 23, 2019 - May 20, 2019
 
 #!/bin/bash
 
@@ -27,18 +27,33 @@ for j in $bb; do
 	id1=`echo $LINE | cut -d ',' -f 2`
 	name=`echo $LINE | cut -d ',' -f 1-2 | tr ',' '_'`
 
-	#if [ ! -d "${OUTPUT}/${id0}/${id1}/roiquant/miccai/" ] ; then mkdir ${OUTPUT}/${id0}/${id1}/roiquant/miccai/ ; fi
+	if [ ! -d "${OUTPUT}/${id0}/${id1}/roiquant/miccai/" ] ; then mkdir ${OUTPUT}/${id0}/${id1}/roiquant/miccai/ ; fi
 
 	### Make image dimensions of reho and alff match that of FSL's MNI brain
 	fslmni=/data/jux/BBL/projects/nasa_antartica/xcpdocker/MNIMiccai/mniJLFLabels.nii.gz
-	rehoimg=${OUTPUT}/${id0}/${id1}/reho/${name}_reho.nii.gz
-	alffimg=${OUTPUT}/${id0}/${id1}/alff/${name}_alff.nii.gz
+	rehoimg=${OUTPUT}/${id0}/${id1}/reho/${id0}_${id1}_reho.nii.gz
+	alffimg=${OUTPUT}/${id0}/${id1}/alff/${id0}_${id1}_alff.nii.gz
 
-	if [[ ! -n ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai.nii.gz ]] ; then
-		antsApplyTransforms -i ${fslmni} -r ${rehoimg} -o ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai.nii.gz
+	#if [[ ! -n ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai.nii.gz ]] ; then
+		antsApplyTransforms -i ${fslmni} -r ${rehoimg} -n MultiLabel -o ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai.nii.gz ;
+	#fi
+
+	miccaidir=${OUTPUT}/${id0}/${id1}/roiquant/miccai
+	miccai=${miccaidir}/${id0}_${id1}_miccai.nii.gz
+
+	### If output csvs and 1D files already exist, delete them
+	if [[ -n ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_alff.csv ]] ; then 
+		rm ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_alff.csv ;
 	fi
-
-	miccai=${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai.nii.gz
+	if [[ -n ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_alff.csv_miccai_mean.1D ]] ; then 
+		rm ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_alff.csv_miccai_mean.1D ;
+	fi
+	if [[ -n ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_reho.csv ]] ; then 
+		rm ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_reho.csv ;
+	fi
+	if [[ -n ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_reho.csv_miccai_mean.1D ]] ; then 
+		rm ${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_reho.csv_miccai_mean.1D ;
+	fi
 
 	### REHO
 	echo ${SNGL} exec -B /data:/home/ebutler/data \ /data/joy/BBL/applications/bids_apps/xcpEngine.simg \ /xcpEngine/utils/quantifyAtlas \ -v /home/ebutler${rehoimg} \ -s mean \ -n miccai \ -p ${id0},${id1} \ -d reho \ -a /home/ebutler${miccai} \ -i /home/ebutler/data/jux/BBL/projects/nasa_antartica/miccaiIndices.txt \ -r /home/ebutler/data/jux/BBL/projects/nasa_antartica/miccaiNodeNames.txt \ -o /home/ebutler${OUTPUT}/${id0}/${id1}/roiquant/miccai/${id0}_${id1}_miccai_mean_reho.csv > /home/ebutler/xcpRehoAlffMiccai/${name}_reho.sh

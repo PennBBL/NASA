@@ -1,5 +1,5 @@
 ### This script finds the dicoms for resting BOLD scans that match certain parameters, and then copies them into a common
-### directory, along with the corresponding dicoms for the T1-weighted image.
+### directory, along with the corresponding dicoms for the T1-weighted image.... NEVER COMPLETED
 ### 
 ### Ellyn Butler
 ### April 9, 2019
