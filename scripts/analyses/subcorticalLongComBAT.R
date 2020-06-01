@@ -61,6 +61,40 @@ final_df$Time <- recode(final_df$Time, "t1"="t0", "t2"="t0", "t3"="t0")
 
 long_df <- reshape2::melt(final_df, c("subject_1", "Time", "group", "comboGroup",
   "age", "sex"), grep("vol_", names(final_df), value=TRUE))
+for (i in 1:nrow(long_df)) {
+  # New time variables
+  if (long_df[i, "Time"] == "t0") {
+    long_df[i, "Time2"] <- 0
+    long_df[i, "Time3"] <- 0
+  } else if (long_df[i, "Time"] == "t12") {
+    long_df[i, "Time2"] <- 1
+    long_df[i, "Time3"] <- 0
+  } else if (long_df[i, "Time"] == "t18") {
+    long_df[i, "Time2"] <- 0
+    long_df[i, "Time3"] <- 1
+  }
+}
+long_df$group <- factor(long_df$group)
 
 mod1 <- longCombat(idvar="subject_1", batchvar="comboGroup",
-  features="variable", formula="group*Time", ranef="(1|subject_1)", data=long_df)
+ features=grep("vol_", names(final_df), value=TRUE),
+ formula="I(group)*I(Time)", ranef="(1|subject_1)", data=final_df)
+
+
+
+
+
+
+
+
+ # New group variables
+ if (long_df[i, "group"] == "Crew") {
+   long_df[i, "Crew"] <- 1
+   long_df[i, "Control"] <- 0
+ } else if (long_df[i, "group"] == "Control") {
+   long_df[i, "Crew"] <- 0
+   long_df[i, "Control"] <- 1
+ } else if (long_df[i, "group"] == "Phantom") {
+   long_df[i, "Crew"] <- 0
+   long_df[i, "Control"] <- 0
+ }
