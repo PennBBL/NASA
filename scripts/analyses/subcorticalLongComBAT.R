@@ -60,49 +60,109 @@ final_df$Time <- recode(final_df$Time, "t1"="t0", "t2"="t0", "t3"="t0")
 ################################### Analysis ###################################
 
 
+crew_phan_df <- final_df[final_df$group %in% c("Crew", "Phantom"), ]
+row.names(crew_phan_df) <- 1:nrow(crew_phan_df)
+crew_phan_df$Crew <- recode(crew_phan_df$group, "Crew"=1, "Phantom"=0)
+crew_phan_df$Time2 <- recode(crew_phan_df$Time, "t0"=0, "t12"=1, "t18"=0)
+crew_phan_df$Time3 <- recode(crew_phan_df$Time, "t0"=0, "t12"=0, "t18"=1)
+
 mod1 <- longCombat(idvar="subject_1", batchvar="scanner",
- features=grep("vol_", names(final_df), value=TRUE),
- formula="I(group)*I(Time)", ranef="(1|subject_1)", data=final_df)
+ features=grep("vol_", names(crew_phan_df), value=TRUE),
+ formula="Crew:Time2 + Crew:Time3", ranef="(1|subject_1)", data=crew_phan_df)
+
 
 data_combat <- mod1$data_combat
 data_combat <- data_combat[, subcortical]
 names(data_combat) <- paste0("combat_", names(data_combat))
-all_data <- cbind(final_df, data_combat)
-all_data <- all_data[, c("subject_1", "Time", "scanner", "group", "sex", "age",
-  grep("combat_", names(all_data), value=TRUE))]
+all_data <- cbind(crew_phan_df, data_combat)
+#all_data <- all_data[, c("subject_1", "Time", "scanner", "group", "sex", "age",
+#  grep("combat_", names(all_data), value=TRUE))]
+all_data <- all_data[all_data$group == "Crew",]
+row.names(all_data) <- 1:nrow(all_data)
 
 #### Plot to see if site effects gone
 for (region in grep("ol", names(all_data), value=TRUE)) {
   all_data[,paste0("perbase_", region)] <- NA
   for (sub in unique(all_data$subject_1)) {
-    if (all_data[all_data$subject_1 == sub, "group"] %in% c("Crew", "Control")) {
-      if ("t0" %in% all_data[all_data$subject_1 == sub, "Time"]) {
-        baseval <- all_data[all_data$subject_1 == sub & all_data$Time == "t0", region]
-        timepoints <- unique(all_data[all_data$subject_1 == sub, "Time"])
-        for (tp in timepoints) {
-          all_data[all_data$subject_1 == sub & all_data$Time == tp, paste0("perbase_", region)] <- all_data[all_data$subject_1 == sub & all_data$Time == tp, region]/baseval
-        }
-      }
-    } else {
-      baseval <- all_data[all_data$subject_1 == sub & all_data$scanner == "CGN", region]
-      scanners <- c("CGN", "HOB", "CHR")
-      for (scan in scanners) {
-        all_data[all_data$subject_1 == sub & all_data$scanner == scan, paste0("perbase_", region)] <- all_data[all_data$subject_1 == sub & all_data$scanner == scan, region]/baseval
+    if ("t0" %in% all_data[all_data$subject_1 == sub, "Time"]) {
+      baseval <- all_data[all_data$subject_1 == sub & all_data$Time == "t0", region]
+      timepoints <- unique(all_data[all_data$subject_1 == sub, "Time"])
+      for (tp in timepoints) {
+        all_data[all_data$subject_1 == sub & all_data$Time == tp, paste0("perbase_", region)] <- all_data[all_data$subject_1 == sub & all_data$Time == tp, region]/baseval
       }
     }
   }
 }
 
+crew_df <- reshape2::melt(all_data, c("subject_1", "Time", "scanner"),
+  c(paste0("perbase_combat_", subcortical), paste0("perbase_", subcortical)))
+names(crew_df) <- c("CrewMember", "Time", "Scanner", "Region", "PercentBase")
+crew_df$PercentBase <- crew_df$PercentBase*100
+
+for (i in 1:nrow(crew_df)) {
+  crewmem <- crew_df[i, "CrewMember"]
+  scanners <- crew_df[crew_df$CrewMember == crewmem &
+    crew_df$Region == "perbase_combat_vol_miccai_ave_Accumbens_Area", "Scanner"]
+  scanstring <- paste(sapply(scanners, paste, collapse="-"), collapse="-")
+  crew_df[i, "ScannerOrder"] <- scanstring
+}
+crew_df$ScannerOrder <- ordered(crew_df$ScannerOrder, c("CGN-HOB-CGN", "CGN-HOB",
+  "CGN-CHR-CGN", "CGN-CHR", "CGN", "CHR-CGN", "HOB-CHR", "HOB-CGN"))
+
+crew_combat_df <- crew_df[crew_df$Region %in% grep("combat",
+  crew_df$Region, value=TRUE),]
+crew_combat_df$Region <- recode(crew_combat_df$Region,
+    "perbase_combat_vol_miccai_ave_Accumbens_Area"="Accumbens",
+    "perbase_combat_vol_miccai_ave_Amygdala"="Amygdala",
+    "perbase_combat_vol_miccai_ave_Caudate"="Caudate",
+    "perbase_combat_vol_miccai_ave_Hippocampus"="Hippocampus",
+    "perbase_combat_vol_miccai_ave_Pallidum"="Pallidum",
+    "perbase_combat_vol_miccai_ave_Putamen"="Putamen",
+    "perbase_combat_vol_miccai_ave_Thalamus_Proper"="Thalamus")
+
+crew_raw_df <- crew_df[!(crew_df$Region %in% grep("combat",
+  crew_df$Region, value=TRUE)),]
+crew_raw_df$Region <- recode(crew_raw_df$Region,
+    "perbase_vol_miccai_ave_Accumbens_Area"="Accumbens",
+    "perbase_vol_miccai_ave_Amygdala"="Amygdala",
+    "perbase_vol_miccai_ave_Caudate"="Caudate",
+    "perbase_vol_miccai_ave_Hippocampus"="Hippocampus",
+    "perbase_vol_miccai_ave_Pallidum"="Pallidum",
+    "perbase_vol_miccai_ave_Putamen"="Putamen",
+    "perbase_vol_miccai_ave_Thalamus_Proper"="Thalamus")
+
+crew_combat_plot <- ggplot(crew_combat_df, aes(x=Time, y=PercentBase, color=ScannerOrder,
+      group=CrewMember)) + ylim(70, 130) +
+    theme_linedraw() + geom_line() + facet_grid(. ~ Region) +
+    ylab("% Baseline") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_color_manual(values = c("blue", "blue", "red", "red", "red", "gray40",
+      "gray", "black")) + ggtitle("Longitudinal ComBat Adjusted Data") +
+    theme(legend.position="bottom") +
+    guides(color=guide_legend(title="Scanner Order"))
+
+crew_raw_plot <- ggplot(crew_raw_df, aes(x=Time, y=PercentBase, color=ScannerOrder,
+      group=CrewMember)) + ylim(70, 130) +
+    theme_linedraw() + geom_line() + facet_grid(. ~ Region) +
+    ylab("% Baseline") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_color_manual(values = c("blue", "blue", "red", "red", "red", "gray40",
+      "gray", "black")) + ggtitle("Raw Data") +
+    theme(legend.position="bottom") +
+    guides(color=guide_legend(title="Scanner Order"))
+
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombat.pdf", width=14, height=5)
+ggarrange(crew_raw_plot, crew_combat_plot, ncol=2)
+dev.off()
+
 #### Model
-all_data$Time2 <- with(all_data, ifelse(Time == "t12", 1,
-  ifelse(Time == "t0" | Time == "t18", 0, NA)))
-all_data$Time3 <- with(all_data, ifelse(Time == "t18", 1,
-  ifelse(Time == "t0" | Time == "t12", 0, NA)))
 
 # Linear Mixed Effects Models (maybe add 3 versus 1) Add indicator for Crew
-small_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Crew, data=all_data)
-med_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Crew + Crew:Time2, data=all_data)
-big_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Crew + Crew:Time2 + Crew:Time3, data=all_data)
-other_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Crew + Crew:Time3, data=all_data)
-KRmodcomp(med_mod, small_mod)
-KRmodcomp(big_mod, med_mod)
+notime_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1), data=all_data)
+time2_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Time2, data=all_data)
+time23_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Time2 + Time3, data=all_data)
+time3_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Time3, data=all_data)
+
+## Test if adding in Time 2 explains additional variance in within subject variability
+KRmodcomp(time23_mod, time3_mod)
+
+## Test if adding in Time 3 explains additional variance in within subject variability
+KRmodcomp(time23_mod, time2_mod)
