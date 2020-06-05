@@ -12,8 +12,11 @@ library('lme4')
 library('pbkrtest')
 source.all('~/Documents/longCombat/R')
 
+set.seed(20)
+
 
 ################################### Data ###################################
+
 # Load data
 demo_df <- read.csv('~/Documents/nasa_antarctica/NASA/data/nasa_antartica_demographics.csv')
 vol_df <- read.csv('~/Documents/nasa_antarctica/NASA/data/nasa_raw_brain_vol.csv')
@@ -54,11 +57,11 @@ final_df <- final_df[final_df$subject_1 != "BJ" & final_df$Time != "t4",]
 row.names(final_df) <- 1:nrow(final_df)
 
 # Recode time for phantoms to t0
+ind_data <- final_df[final_df$group %in% c("Crew", "Phantom"), ]
 final_df$Time <- recode(final_df$Time, "t1"="t0", "t2"="t0", "t3"="t0")
 
 
-################################### Analysis ###################################
-
+################################### Plot ###################################
 
 crew_phan_df <- final_df[final_df$group %in% c("Crew", "Phantom"), ]
 row.names(crew_phan_df) <- 1:nrow(crew_phan_df)
@@ -70,13 +73,13 @@ mod1 <- longCombat(idvar="subject_1", batchvar="scanner",
  features=grep("vol_", names(crew_phan_df), value=TRUE),
  formula="Crew:Time2 + Crew:Time3", ranef="(1|subject_1)", data=crew_phan_df)
 
-
 data_combat <- mod1$data_combat
 data_combat <- data_combat[, subcortical]
 names(data_combat) <- paste0("combat_", names(data_combat))
 all_data <- cbind(crew_phan_df, data_combat)
 #all_data <- all_data[, c("subject_1", "Time", "scanner", "group", "sex", "age",
 #  grep("combat_", names(all_data), value=TRUE))]
+tmp_data <- all_data
 all_data <- all_data[all_data$group == "Crew",]
 row.names(all_data) <- 1:nrow(all_data)
 
@@ -153,16 +156,102 @@ pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombat.pdf", widt
 ggarrange(crew_raw_plot, crew_combat_plot, ncol=2)
 dev.off()
 
-#### Model
+######### Not percent base values plot #########
+crew_values_df <- reshape2::melt(all_data, c("subject_1", "Time", "scanner"),
+  c(paste0("combat_", subcortical), subcortical))
+names(crew_values_df) <- c("CrewMember", "Time", "Scanner", "Region", "Values")
+crew_values_df$DataType <- c(rep("Combat", 448), rep("Raw", 448))
 
-# Linear Mixed Effects Models (maybe add 3 versus 1) Add indicator for Crew
-notime_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1), data=all_data)
-time2_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Time2, data=all_data)
-time23_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Time2 + Time3, data=all_data)
-time3_mod <- lmer(combat_vol_miccai_ave_Accumbens_Area ~ (1|subject_1) + Time3, data=all_data)
+for (i in 1:nrow(crew_values_df)) {
+  crewmem <- crew_values_df[i, "CrewMember"]
+  scanners <- crew_values_df[crew_values_df$CrewMember == crewmem &
+    crew_values_df$Region == "combat_vol_miccai_ave_Accumbens_Area", "Scanner"]
+  scanstring <- paste(sapply(scanners, paste, collapse="-"), collapse="-")
+  crew_values_df[i, "ScannerOrder"] <- scanstring
+}
+crew_df$ScannerOrder <- ordered(crew_df$ScannerOrder, c("CGN-HOB-CGN", "CGN-HOB",
+  "CGN-CHR-CGN", "CGN-CHR", "CGN", "CHR-CGN", "HOB-CHR", "HOB-CGN"))
 
-## Test if adding in Time 2 explains additional variance in within subject variability
-KRmodcomp(time23_mod, time3_mod)
+crew_values_df$Region <- recode(crew_values_df$Region,
+    "vol_miccai_ave_Accumbens_Area"="Accumbens",
+    "vol_miccai_ave_Amygdala"="Amygdala",
+    "vol_miccai_ave_Caudate"="Caudate",
+    "vol_miccai_ave_Hippocampus"="Hippocampus",
+    "vol_miccai_ave_Pallidum"="Pallidum",
+    "vol_miccai_ave_Putamen"="Putamen",
+    "vol_miccai_ave_Thalamus_Proper"="Thalamus",
+    "combat_vol_miccai_ave_Accumbens_Area"="Accumbens",
+    "combat_vol_miccai_ave_Amygdala"="Amygdala",
+    "combat_vol_miccai_ave_Caudate"="Caudate",
+    "combat_vol_miccai_ave_Hippocampus"="Hippocampus",
+    "combat_vol_miccai_ave_Pallidum"="Pallidum",
+    "combat_vol_miccai_ave_Putamen"="Putamen",
+    "combat_vol_miccai_ave_Thalamus_Proper"="Thalamus")
 
-## Test if adding in Time 3 explains additional variance in within subject variability
-KRmodcomp(time23_mod, time2_mod)
+crew_values_plot <- ggplot(crew_values_df, aes(x=Time, y=Values, color=ScannerOrder,
+      group=CrewMember)) +
+    theme_linedraw() + geom_line() + facet_grid(DataType ~ Region, scales="free_y") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_color_manual(values = c("blue", "blue", "red", "red", "red", "gray40",
+      "gray", "black")) + theme(legend.position="bottom") +
+    guides(color=guide_legend(title="Scanner Order"))
+
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombat_values.pdf", width=12, height=12)
+crew_values_plot
+dev.off()
+
+
+################################### Model ###################################
+
+
+results <- data.frame(Region=c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
+  "Pallidum", "Putamen", "Thalamus"), LongCombat_Coef_Time2=rep(NA, 7),
+  LongCombat_P_Time2=rep(NA, 7), LongCombat_Coef_Time3=rep(NA, 7),
+  LongCombat_P_Time3=rep(NA, 7), FixedScan_Coef_Time2=rep(NA, 7),
+  FixedScan_P_Time2=rep(NA, 7), FixedScan_Coef_Time3=rep(NA, 7),
+  FixedScan_P_Time3=rep(NA, 7), IndT_MeanDiff_Time2=rep(NA, 7),
+  IndT_P_Time2=rep(NA, 7), IndT_MeanDiff_Time3=rep(NA, 7), IndT_P_Time3=rep(NA, 7))
+
+######### Model with Combat Data #########
+
+for (i in 1:length(subcortical)) {
+  region <- paste0("combat_", subcortical)[i]
+  time2_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time2")), data=all_data)
+  time23_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time2 + Time3")), data=all_data)
+  time3_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time3")), data=all_data)
+
+  ## Test if adding in Time 2 explains additional variance in within subject variability
+  results[i, "LongCombat_P_Time2"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
+  results[i, "LongCombat_Coef_Time2"] <- time23_mod@beta[2]
+
+  ## Test if adding in Time 3 explains additional variance in within subject variability
+  results[i, "LongCombat_P_Time3"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
+  results[i, "LongCombat_Coef_Time3"] <- time23_mod@beta[3]
+}
+
+######### Model with Fixed Effect for Scanner in Raw Data #########
+
+fe_data <- tmp_data
+
+for (i in 1:length(subcortical)) {
+  region <- subcortical[i]
+  time2_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time2 + group")), data=fe_data)
+  time23_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time2 + Time3 + group")), data=fe_data)
+  time3_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time3 + group")), data=fe_data)
+
+  ## Test if adding in Time 2 explains additional variance in within subject variability
+  results[i, "FixedScan_P_Time2"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
+  results[i, "FixedScan_Coef_Time2"] <- time23_mod@beta[2]
+
+  ## Test if adding in Time 3 explains additional variance in within subject variability
+  results[i, "FixedScan_P_Time3"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
+  results[i, "FixedScan_Coef_Time3"] <- time23_mod@beta[3]
+}
+
+results <- results[, 1:9]
+
+write.csv(results, file='~/Documents/nasa_antarctica/NASA/data/results/longCombat_vs_FixedScanner.csv', row.names=FALSE)
+
+######### Independent Samples T-tests #########
+
+ind_data <- ind_data[, c("subject_1", "Time", "scanner", "group", subcortical)]
