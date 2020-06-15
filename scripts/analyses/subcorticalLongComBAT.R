@@ -2,14 +2,16 @@
 ### a stay in Antarctica, using longitudinal combat to address site effects
 ###
 ### Ellyn Butler
-### May 28, 2020 - June 3, 2020
+### May 28, 2020 - June 12, 2020
 
 library('miceadds')
 library('ggplot2')
+library('ggseg')
 library('ggpubr')
 library('dplyr')
 library('lme4')
 library('pbkrtest')
+library('R.utils')
 source.all('~/Documents/longCombat/R')
 
 set.seed(20)
@@ -72,6 +74,8 @@ crew_phan_df$Time3 <- recode(crew_phan_df$Time, "t0"=0, "t12"=0, "t18"=1)
 mod1 <- longCombat(idvar="subject_1", batchvar="scanner",
  features=grep("vol_", names(crew_phan_df), value=TRUE),
  formula="Crew:Time2 + Crew:Time3", ranef="(1|subject_1)", data=crew_phan_df)
+ #ranef="1 + (1|subject_1)" Probably not, since overall intercept isn't random
+ #Is the "Crew:" part necessary, since I coded it such that all phantom scans are at t0?
 
 data_combat <- mod1$data_combat
 data_combat <- data_combat[, subcortical]
@@ -139,7 +143,8 @@ crew_combat_plot <- ggplot(crew_combat_df, aes(x=Time, y=PercentBase, color=Scan
     theme_linedraw() + geom_line() + facet_grid(. ~ Region) +
     ylab("% Baseline") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_color_manual(values = c("blue", "blue", "red", "red", "red", "gray40",
-      "gray", "black")) + ggtitle("Longitudinal ComBat Adjusted Data") +
+      "gray", "black")) +
+    ggtitle(expression(paste(bold("After"), " Longitudinal ComBat Adjustment"))) +
     theme(legend.position="bottom") +
     guides(color=guide_legend(title="Scanner Order"))
 
@@ -148,7 +153,8 @@ crew_raw_plot <- ggplot(crew_raw_df, aes(x=Time, y=PercentBase, color=ScannerOrd
     theme_linedraw() + geom_line() + facet_grid(. ~ Region) +
     ylab("% Baseline") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_color_manual(values = c("blue", "blue", "red", "red", "red", "gray40",
-      "gray", "black")) + ggtitle("Raw Data") +
+      "gray", "black")) +
+    ggtitle(expression(paste(bold("Before"), " Longitudinal ComBat Adjustment"))) +
     theme(legend.position="bottom") +
     guides(color=guide_legend(title="Scanner Order"))
 
@@ -235,9 +241,9 @@ fe_data <- tmp_data
 
 for (i in 1:length(subcortical)) {
   region <- subcortical[i]
-  time2_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time2 + group")), data=fe_data)
-  time23_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time2 + Time3 + group")), data=fe_data)
-  time3_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time3 + group")), data=fe_data)
+  time2_mod <- lmer(formula(paste(region, "~ 1 + (1|subject_1) + Time2 + group")), data=fe_data) #Include "1 +"?
+  time23_mod <- lmer(formula(paste(region, "~ 1 + (1|subject_1) + Time2 + Time3 + group")), data=fe_data)
+  time3_mod <- lmer(formula(paste(region, "~ 1 + (1|subject_1) + Time3 + group")), data=fe_data)
 
   ## Test if adding in Time 2 explains additional variance in within subject variability
   results[i, "FixedScan_P_Time2"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
@@ -252,6 +258,62 @@ results <- results[, 1:9]
 
 write.csv(results, file='~/Documents/nasa_antarctica/NASA/data/results/longCombat_vs_FixedScanner.csv', row.names=FALSE)
 
+resultsTime2 <- results[, c('Region', 'LongCombat_Coef_Time2', 'LongCombat_P_Time2')]
+resultsTime2$Time <- 't12'
+names(resultsTime2) <- c('Region', 'Coef', 'P', 'Time')
+resultsTime3 <- results[, c('Region', 'LongCombat_Coef_Time3', 'LongCombat_P_Time3')]
+resultsTime3$Time <- 't18'
+names(resultsTime3) <- c('Region', 'Coef', 'P', 'Time')
+longcombat_results <- rbind(resultsTime2, resultsTime3)
+
+longcombat_results$P_FDR <- p.adjust(longcombat_results$P, method='fdr')
+longcombat_results$P_FDR_NegLog10 <- -log10(longcombat_results$P_FDR)
+
+
 ######### Independent Samples T-tests #########
 
 ind_data <- ind_data[, c("subject_1", "Time", "scanner", "group", subcortical)]
+# TO DO
+
+################################ Brain Figure ################################
+
+longcombat_results$area <- recode(longcombat_results$Region,
+  "Hippocampus"="hippocampus", "Thalamus"="thalamus proper", "Putamen"="putamen",
+  "Amygdala"="amygdala", "Pallidum"="pallidum", "Caudate"="caudate")
+
+aseg_t12 <- aseg
+for (i in 1:nrow(aseg_t12)) {
+  thisarea <- as.character(aseg_t12[i, 'area'])
+  if (thisarea %in% longcombat_results$area) {
+    aseg_t12[i, 'P_FDR_NegLog10'] <- longcombat_results[longcombat_results$area == thisarea &
+      longcombat_results$Time == 't12', 'P_FDR_NegLog10']
+  }
+}
+aseg_t18 <- aseg
+for (i in 1:nrow(aseg_t18)) {
+  thisarea <- as.character(aseg_t18[i, 'area'])
+  if (thisarea %in% longcombat_results$area) {
+    aseg_t18[i, 'P_FDR_NegLog10'] <- longcombat_results[longcombat_results$area == thisarea &
+      longcombat_results$Time == 't18', 'P_FDR_NegLog10']
+  }
+}
+
+p_t12 <- ggseg(aseg_t12, atlas="aseg", hemisphere=c("left", "right"),
+  mapping=aes(fill=P_FDR_NegLog10), size=.1, colour="black") +
+  labs(fill=expression(-log[10]*"p-value")) +
+  scale_fill_gradient(low="lavenderblush1", high="red3", limits=c(0, 5)) +
+  theme(text=element_text(size=14), axis.title.x=element_blank(),
+    axis.text.x=element_blank()) +
+  ggtitle("Effect Immediately After Antarctica (t12)")
+
+p_t18 <- ggseg(aseg_t18, atlas="aseg", hemisphere=c("left", "right"),
+  mapping=aes(fill=P_FDR_NegLog10), size=.1, colour="black") +
+  labs(fill=expression(-log[10]*"p-value")) +
+  scale_fill_gradient(low="lavenderblush1", high="red3", limits=c(0, 5)) +
+  theme(text=element_text(size=14), axis.title.x=element_blank(),
+    axis.text.x=element_blank()) + #, family="Arial"
+  ggtitle("Effect Six Months After Antarctica (t18)")
+
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/ggsegNegLogP.pdf", width=14, height=5)
+ggarrange(p_t12, p_t18, ncol=2)
+dev.off()
