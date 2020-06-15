@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+
+</head>
+<body>
+&lt;style&gt;
+html, body { background-color: white; }
+table { border-collapse:collapse; border:none; }
+caption { font-weight: bold; text-align:left; }
+td {  }
+.thead { border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; }
+.tdata { padding:0.2cm; text-align:left; vertical-align:top; }
+.arc { background-color:#f2f2f2; }
+.summary { padding-top:0.1cm; padding-bottom:0.1cm; }
+.summarydata { text-align:left; }
+.fixedparts { font-weight:bold; text-align:left; }
+.randomparts { font-weight:bold; text-align:left; padding-top:.8em; }
+.zeroparts { font-weight:bold; text-align:left; padding-top:.8em; }
+.simplexparts { font-weight:bold; text-align:left; padding-top:.8em; }
+.lasttablerow { border-bottom: double; }
+.firsttablerow {  }
+.firstsumrow { border-top:1px solid; }
+.labelcellborder { border-bottom:1px solid; }
+.depvarhead { text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal; }
+.leftalign { text-align:left; }
+.centeralign { text-align:center; }
+.firsttablecol { text-align:left; }
+.footnote { font-style:italic; border-top:double black; text-align:right; }
+.subtitle { font-weight: normal; }
+.modelcolumn1 {  }
+.modelcolumn2 {  }
+.modelcolumn3 {  }
+.modelcolumn4 {  }
+.modelcolumn5 {  }
+.modelcolumn6 {  }
+.modelcolumn7 {  }
+.col1 {  }
+.col2 {  }
+.col3 {  }
+.col4 {  }
+.col5 {  }
+&lt;/style&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;th class="thead firsttablerow firsttablecol col1"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" class="thead firsttablerow"&gt;Accumbens&lt;/th&gt;
+&lt;th colspan="3" class="thead firsttablerow"&gt;Amygdala&lt;/th&gt;
+&lt;th colspan="3" class="thead firsttablerow"&gt;Caudate&lt;/th&gt;
+&lt;th colspan="3" class="thead firsttablerow"&gt;Hippocampus&lt;/th&gt;
+&lt;th colspan="3" class="thead firsttablerow"&gt;Pallidum&lt;/th&gt;
+&lt;th colspan="3" class="thead firsttablerow"&gt;Putamen&lt;/th&gt;
+&lt;th colspan="3" class="thead firsttablerow"&gt;Thalamus&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class="depvarhead firsttablerow firsttablecol col1"&gt;Predictors&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col2"&gt;Estimates&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col3"&gt;CI&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col4"&gt;p&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col5"&gt;Estimates&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col6"&gt;CI&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col7"&gt;p&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col8"&gt;Estimates&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col9"&gt;CI&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col10"&gt;p&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col11"&gt;Estimates&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col12"&gt;CI&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col13"&gt;p&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col14"&gt;Estimates&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col15"&gt;CI&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col16"&gt;p&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col17"&gt;Estimates&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col18"&gt;CI&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col19"&gt;p&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col20"&gt;Estimates&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col21"&gt;CI&lt;/td&gt;
+&lt;td class="depvarhead firsttablerow col22"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class="tdata firsttablecol col1"&gt;(Intercept)&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col2"&gt;456.28&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col3"&gt;423.67&amp;nbsp;&amp;ndash;&amp;nbsp;488.89&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col4"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col5"&gt;1158.79&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col6"&gt;1096.39&amp;nbsp;&amp;ndash;&amp;nbsp;1221.18&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col8"&gt;3405.83&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col9"&gt;3219.12&amp;nbsp;&amp;ndash;&amp;nbsp;3592.54&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col10"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col11"&gt;3777.45&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col12"&gt;3664.69&amp;nbsp;&amp;ndash;&amp;nbsp;3890.20&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col13"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col14"&gt;1378.71&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col15"&gt;1311.98&amp;nbsp;&amp;ndash;&amp;nbsp;1445.43&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col16"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col17"&gt;4553.79&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col18"&gt;4347.55&amp;nbsp;&amp;ndash;&amp;nbsp;4760.02&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col19"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col20"&gt;7995.27&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col21"&gt;7631.60&amp;nbsp;&amp;ndash;&amp;nbsp;8358.95&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col22"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class="tdata firsttablecol col1"&gt;t12&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col2"&gt;-34.59&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col3"&gt;-51.02&amp;nbsp;&amp;ndash;&amp;nbsp;-18.16&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col4"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col5"&gt;-85.15&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col6"&gt;-139.77&amp;nbsp;&amp;ndash;&amp;nbsp;-30.54&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col7"&gt;&lt;strong&gt;0.003&lt;/strong&gt;&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col8"&gt;-89.27&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col9"&gt;-140.70&amp;nbsp;&amp;ndash;&amp;nbsp;-37.84&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col10"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col11"&gt;-99.63&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col12"&gt;-154.98&amp;nbsp;&amp;ndash;&amp;nbsp;-44.29&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col13"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col14"&gt;-1.13&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col15"&gt;-37.12&amp;nbsp;&amp;ndash;&amp;nbsp;34.86&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col16"&gt;0.950&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col17"&gt;-124.90&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col18"&gt;-200.01&amp;nbsp;&amp;ndash;&amp;nbsp;-49.80&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col19"&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col20"&gt;-377.85&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col21"&gt;-515.80&amp;nbsp;&amp;ndash;&amp;nbsp;-239.91&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col22"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class="tdata firsttablecol col1"&gt;t18&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col2"&gt;-7.46&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col3"&gt;-25.16&amp;nbsp;&amp;ndash;&amp;nbsp;10.25&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn1 col4"&gt;0.399&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col5"&gt;6.18&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col6"&gt;-52.47&amp;nbsp;&amp;ndash;&amp;nbsp;64.84&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn2 col7"&gt;0.832&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col8"&gt;-19.34&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col9"&gt;-74.82&amp;nbsp;&amp;ndash;&amp;nbsp;36.14&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn3 col10"&gt;0.484&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col11"&gt;-24.94&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col12"&gt;-84.59&amp;nbsp;&amp;ndash;&amp;nbsp;34.71&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn4 col13"&gt;0.403&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col14"&gt;-30.08&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col15"&gt;-68.86&amp;nbsp;&amp;ndash;&amp;nbsp;8.70&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn5 col16"&gt;0.125&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col17"&gt;-38.51&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col18"&gt;-119.50&amp;nbsp;&amp;ndash;&amp;nbsp;42.49&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn6 col19"&gt;0.342&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col20"&gt;-14.63&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col21"&gt;-163.37&amp;nbsp;&amp;ndash;&amp;nbsp;134.11&lt;/td&gt;
+&lt;td class="tdata centeralign modelcolumn7 col22"&gt;0.843&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td colspan="22" class="randomparts"&gt;Random Effects&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td class="tdata leftalign summary"&gt;&amp;sigma;&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;684.00&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;7685.74&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;6668.69&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;7758.54&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;3285.77&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;14243.38&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;48060.05&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td class="tdata leftalign summary"&gt;&amp;tau;&lt;sub&gt;00&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;5519.07 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;14607.75 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;197600.29 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;66431.47 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;22654.96 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;234659.41 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;725676.64 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td class="tdata leftalign summary"&gt;ICC&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.89&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.66&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.97&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.90&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.87&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.94&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.94&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td class="tdata leftalign summary"&gt;N&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;tr&gt;
+&lt;td class="tdata leftalign summary firstsumrow"&gt;Observations&lt;/td&gt;
+&lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+&lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+&lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+&lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+&lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+&lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+&lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class="tdata leftalign summary"&gt;Marginal R&lt;sup&gt;2&lt;/sup&gt; / Conditional R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.037 / 0.894&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.075 / 0.681&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.008 / 0.968&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.025 / 0.898&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.007 / 0.874&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.012 / 0.943&lt;/td&gt;
+&lt;td class="tdata summary summarydata" colspan="3"&gt;0.040 / 0.940&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv="Content-type" content="text/html;charset=UTF-8"&gt;
+&lt;style&gt;
+html, body { background-color: white; }
+table { border-collapse:collapse; border:none; }
+caption { font-weight: bold; text-align:left; }
+td {  }
+.thead { border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; }
+.tdata { padding:0.2cm; text-align:left; vertical-align:top; }
+.arc { background-color:#f2f2f2; }
+.summary { padding-top:0.1cm; padding-bottom:0.1cm; }
+.summarydata { text-align:left; }
+.fixedparts { font-weight:bold; text-align:left; }
+.randomparts { font-weight:bold; text-align:left; padding-top:.8em; }
+.zeroparts { font-weight:bold; text-align:left; padding-top:.8em; }
+.simplexparts { font-weight:bold; text-align:left; padding-top:.8em; }
+.lasttablerow { border-bottom: double; }
+.firsttablerow {  }
+.firstsumrow { border-top:1px solid; }
+.labelcellborder { border-bottom:1px solid; }
+.depvarhead { text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal; }
+.leftalign { text-align:left; }
+.centeralign { text-align:center; }
+.firsttablecol { text-align:left; }
+.footnote { font-style:italic; border-top:double black; text-align:right; }
+.subtitle { font-weight: normal; }
+.modelcolumn1 {  }
+.modelcolumn2 {  }
+.modelcolumn3 {  }
+.modelcolumn4 {  }
+.modelcolumn5 {  }
+.modelcolumn6 {  }
+.modelcolumn7 {  }
+.col1 {  }
+.col2 {  }
+.col3 {  }
+.col4 {  }
+.col5 {  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th class="thead firsttablerow firsttablecol col1"&gt;&amp;nbsp;&lt;/th&gt;
+    &lt;th colspan="3" class="thead firsttablerow"&gt;Accumbens&lt;/th&gt;
+    &lt;th colspan="3" class="thead firsttablerow"&gt;Amygdala&lt;/th&gt;
+    &lt;th colspan="3" class="thead firsttablerow"&gt;Caudate&lt;/th&gt;
+    &lt;th colspan="3" class="thead firsttablerow"&gt;Hippocampus&lt;/th&gt;
+    &lt;th colspan="3" class="thead firsttablerow"&gt;Pallidum&lt;/th&gt;
+    &lt;th colspan="3" class="thead firsttablerow"&gt;Putamen&lt;/th&gt;
+    &lt;th colspan="3" class="thead firsttablerow"&gt;Thalamus&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="depvarhead firsttablerow firsttablecol col1"&gt;Predictors&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col2"&gt;Estimates&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col3"&gt;CI&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col4"&gt;p&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col5"&gt;Estimates&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col6"&gt;CI&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col7"&gt;p&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col8"&gt;Estimates&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col9"&gt;CI&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col10"&gt;p&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col11"&gt;Estimates&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col12"&gt;CI&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col13"&gt;p&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col14"&gt;Estimates&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col15"&gt;CI&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col16"&gt;p&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col17"&gt;Estimates&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col18"&gt;CI&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col19"&gt;p&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col20"&gt;Estimates&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col21"&gt;CI&lt;/td&gt;
+    &lt;td class="depvarhead firsttablerow col22"&gt;p&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tdata firsttablecol col1"&gt;(Intercept)&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col2"&gt;456.28&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col3"&gt;423.67&amp;nbsp;&amp;ndash;&amp;nbsp;488.89&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col4"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col5"&gt;1158.79&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col6"&gt;1096.39&amp;nbsp;&amp;ndash;&amp;nbsp;1221.18&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col8"&gt;3405.83&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col9"&gt;3219.12&amp;nbsp;&amp;ndash;&amp;nbsp;3592.54&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col10"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col11"&gt;3777.45&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col12"&gt;3664.69&amp;nbsp;&amp;ndash;&amp;nbsp;3890.20&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col13"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col14"&gt;1378.71&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col15"&gt;1311.98&amp;nbsp;&amp;ndash;&amp;nbsp;1445.43&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col16"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col17"&gt;4553.79&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col18"&gt;4347.55&amp;nbsp;&amp;ndash;&amp;nbsp;4760.02&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col19"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col20"&gt;7995.27&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col21"&gt;7631.60&amp;nbsp;&amp;ndash;&amp;nbsp;8358.95&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col22"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tdata firsttablecol col1"&gt;t12&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col2"&gt;-34.59&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col3"&gt;-51.02&amp;nbsp;&amp;ndash;&amp;nbsp;-18.16&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col4"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col5"&gt;-85.15&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col6"&gt;-139.77&amp;nbsp;&amp;ndash;&amp;nbsp;-30.54&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col7"&gt;&lt;strong&gt;0.003&lt;/strong&gt;&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col8"&gt;-89.27&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col9"&gt;-140.70&amp;nbsp;&amp;ndash;&amp;nbsp;-37.84&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col10"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col11"&gt;-99.63&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col12"&gt;-154.98&amp;nbsp;&amp;ndash;&amp;nbsp;-44.29&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col13"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col14"&gt;-1.13&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col15"&gt;-37.12&amp;nbsp;&amp;ndash;&amp;nbsp;34.86&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col16"&gt;0.950&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col17"&gt;-124.90&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col18"&gt;-200.01&amp;nbsp;&amp;ndash;&amp;nbsp;-49.80&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col19"&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col20"&gt;-377.85&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col21"&gt;-515.80&amp;nbsp;&amp;ndash;&amp;nbsp;-239.91&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col22"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tdata firsttablecol col1"&gt;t18&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col2"&gt;-7.46&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col3"&gt;-25.16&amp;nbsp;&amp;ndash;&amp;nbsp;10.25&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn1 col4"&gt;0.399&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col5"&gt;6.18&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col6"&gt;-52.47&amp;nbsp;&amp;ndash;&amp;nbsp;64.84&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn2 col7"&gt;0.832&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col8"&gt;-19.34&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col9"&gt;-74.82&amp;nbsp;&amp;ndash;&amp;nbsp;36.14&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn3 col10"&gt;0.484&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col11"&gt;-24.94&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col12"&gt;-84.59&amp;nbsp;&amp;ndash;&amp;nbsp;34.71&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn4 col13"&gt;0.403&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col14"&gt;-30.08&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col15"&gt;-68.86&amp;nbsp;&amp;ndash;&amp;nbsp;8.70&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn5 col16"&gt;0.125&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col17"&gt;-38.51&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col18"&gt;-119.50&amp;nbsp;&amp;ndash;&amp;nbsp;42.49&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn6 col19"&gt;0.342&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col20"&gt;-14.63&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col21"&gt;-163.37&amp;nbsp;&amp;ndash;&amp;nbsp;134.11&lt;/td&gt;
+    &lt;td class="tdata centeralign modelcolumn7 col22"&gt;0.843&lt;/td&gt;
+&lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td colspan="22" class="randomparts"&gt;Random Effects&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td class="tdata leftalign summary"&gt;&amp;sigma;&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;684.00&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;7685.74&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;6668.69&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;7758.54&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;3285.77&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;14243.38&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;48060.05&lt;/td&gt;
+
+  &lt;tr&gt;
+    &lt;td class="tdata leftalign summary"&gt;&amp;tau;&lt;sub&gt;00&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;5519.07 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;14607.75 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;197600.29 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;66431.47 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;22654.96 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;234659.41 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;725676.64 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+
+  &lt;tr&gt;
+    &lt;td class="tdata leftalign summary"&gt;ICC&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.89&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.66&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.97&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.90&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.87&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.94&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.94&lt;/td&gt;
+
+  &lt;tr&gt;
+    &lt;td class="tdata leftalign summary"&gt;N&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+  &lt;tr&gt;
+    &lt;td class="tdata leftalign summary firstsumrow"&gt;Observations&lt;/td&gt;
+    &lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+    &lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+    &lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+    &lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+    &lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+    &lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+    &lt;td class="tdata summary summarydata firstsumrow" colspan="3"&gt;64&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tdata leftalign summary"&gt;Marginal R&lt;sup&gt;2&lt;/sup&gt; / Conditional R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.037 / 0.894&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.075 / 0.681&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.008 / 0.968&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.025 / 0.898&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.007 / 0.874&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.012 / 0.943&lt;/td&gt;
+    &lt;td class="tdata summary summarydata" colspan="3"&gt;0.040 / 0.940&lt;/td&gt;
+  &lt;/tr&gt;
+
+&lt;/table&gt;
+
+&lt;/body&gt;&lt;/html&gt;
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Accumbens&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Amygdala&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Caudate&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Hippocampus&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Pallidum&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Putamen&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Thalamus&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col8"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col9"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  0"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  1"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  2"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  3"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  4"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  5"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  6"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  7"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  8"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  9"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  0"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  1"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  2"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;456.28&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;423.67&amp;nbsp;&amp;ndash;&amp;nbsp;488.89&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1158.79&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1096.39&amp;nbsp;&amp;ndash;&amp;nbsp;1221.18&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;3405.83&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;3219.12&amp;nbsp;&amp;ndash;&amp;nbsp;3592.54&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;3777.45&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;3664.69&amp;nbsp;&amp;ndash;&amp;nbsp;3890.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;1378.71&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;1311.98&amp;nbsp;&amp;ndash;&amp;nbsp;1445.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;4553.79&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;4347.55&amp;nbsp;&amp;ndash;&amp;nbsp;4760.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;7995.27&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;7631.60&amp;nbsp;&amp;ndash;&amp;nbsp;8358.95&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;t12&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-34.59&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-51.02&amp;nbsp;&amp;ndash;&amp;nbsp;-18.16&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-85.15&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-139.77&amp;nbsp;&amp;ndash;&amp;nbsp;-30.54&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.003&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;-89.27&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;-140.70&amp;nbsp;&amp;ndash;&amp;nbsp;-37.84&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;-99.63&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;-154.98&amp;nbsp;&amp;ndash;&amp;nbsp;-44.29&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;-1.13&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;-37.12&amp;nbsp;&amp;ndash;&amp;nbsp;34.86&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;0.950&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;-124.90&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;-200.01&amp;nbsp;&amp;ndash;&amp;nbsp;-49.80&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;-377.85&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;-515.80&amp;nbsp;&amp;ndash;&amp;nbsp;-239.91&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;t18&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-7.46&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-25.16&amp;nbsp;&amp;ndash;&amp;nbsp;10.25&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.399&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;6.18&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-52.47&amp;nbsp;&amp;ndash;&amp;nbsp;64.84&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.832&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;-19.34&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;-74.82&amp;nbsp;&amp;ndash;&amp;nbsp;36.14&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;0.484&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;-24.94&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;-84.59&amp;nbsp;&amp;ndash;&amp;nbsp;34.71&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;0.403&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;-30.08&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;-68.86&amp;nbsp;&amp;ndash;&amp;nbsp;8.70&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;0.125&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;-38.51&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;-119.50&amp;nbsp;&amp;ndash;&amp;nbsp;42.49&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;0.342&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;-14.63&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;-163.37&amp;nbsp;&amp;ndash;&amp;nbsp;134.11&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;0.843&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td colspan="22" style="font-weight:bold; text-align:left; padding-top:.8em;"&gt;Random Effects&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;sigma;&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;684.00&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;7685.74&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;6668.69&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;7758.54&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3285.77&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;14243.38&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;48060.05&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;tau;&lt;sub&gt;00&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;5519.07 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;14607.75 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;197600.29 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;66431.47 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;22654.96 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;234659.41 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;725676.64 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;ICC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.89&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.66&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.97&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.90&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.87&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.94&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.94&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;N&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25 &lt;sub&gt;subject&lt;/sub&gt;&lt;/td&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;64&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;64&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;64&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;64&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;64&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;64&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;64&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;Marginal R&lt;sup&gt;2&lt;/sup&gt; / Conditional R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.037 / 0.894&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.075 / 0.681&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.008 / 0.968&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.025 / 0.898&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.007 / 0.874&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.012 / 0.943&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.040 / 0.940&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+TRUE
+</body>
+</html>

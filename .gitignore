@@ -4,3 +4,4 @@
 *.csv
 *core.*
 *DS_Store*
+*tables/*

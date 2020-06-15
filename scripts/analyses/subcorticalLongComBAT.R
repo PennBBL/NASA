@@ -12,6 +12,9 @@ library('dplyr')
 library('lme4')
 library('pbkrtest')
 library('R.utils')
+library('TMB')
+library('sjPlot')
+library('tableHTML')
 source.all('~/Documents/longCombat/R')
 
 set.seed(20)
@@ -21,18 +24,21 @@ set.seed(20)
 
 # Load data
 demo_df <- read.csv('~/Documents/nasa_antarctica/NASA/data/nasa_antartica_demographics.csv')
+names(demo_df)[names(demo_df) == 'subject_1'] <- 'subject'
 vol_df <- read.csv('~/Documents/nasa_antarctica/NASA/data/nasa_raw_brain_vol.csv')
+names(vol_df)[names(vol_df) == 'subject_1'] <- 'subject'
 params_df <- read.csv('~/Documents/nasa_antarctica/NASA/data/nasa_T1_acparams.csv')
+names(params_df)[names(params_df) == 'subject_1'] <- 'subject'
 
 # Subset demo
-demo_df <- demo_df[, c("subject_1", "Time", "PatientSex", "PatientAgeYears")]
-names(demo_df) <- c("subject_1", "Time", "sex", "age")
+demo_df <- demo_df[, c("subject", "Time", "PatientSex", "PatientAgeYears")]
+names(demo_df) <- c("subject", "Time", "sex", "age")
 
 # Subset volume
 subcortical <- c("vol_miccai_ave_Accumbens_Area", "vol_miccai_ave_Amygdala",
   "vol_miccai_ave_Caudate", "vol_miccai_ave_Hippocampus", "vol_miccai_ave_Pallidum",
   "vol_miccai_ave_Putamen", "vol_miccai_ave_Thalamus_Proper")
-vol_df <- vol_df[, c("subject_1", "Time", "scanner", "group",
+vol_df <- vol_df[, c("subject", "Time", "scanner", "group",
   grep("_ave_", names(vol_df), value=TRUE))]
 
 # Subset params
@@ -45,17 +51,17 @@ params_df$comboGroup <- recode(params_df$combo, "CGN_0.9375_0.9375_1_9_ROW_3.51_
   "HOB_0.9375_0.9375_1_15_ROW_3.228_8.716"="Five",
   "HOB_0.9375_0.9375_1_9_ROW_5.296_12.976"="Six",
   "CGN_0.9375_0.9375_1_9_ROW_3.37_1810"="Seven")
-#params_df[,c("subject_1", "Time", "comboGroup", "scanner")]
+#params_df[,c("subject", "Time", "comboGroup", "scanner")]
 
 params_df <- params_df[params_df$comboGroup %in% c("One", "Two", "Three"),]
 row.names(params_df) <- 1:nrow(params_df)
-params_df <- params_df[, c("subject_1", "Time", "scanner", "comboGroup")]
+params_df <- params_df[, c("subject", "Time", "scanner", "comboGroup")]
 
 final_df <- merge(demo_df, vol_df)
 final_df <- merge(final_df, params_df)
 
 # Remove irrelevant phantoms
-final_df <- final_df[final_df$subject_1 != "BJ" & final_df$Time != "t4",]
+final_df <- final_df[final_df$subject != "BJ" & final_df$Time != "t4",]
 row.names(final_df) <- 1:nrow(final_df)
 
 # Recode time for phantoms to t0
@@ -68,40 +74,42 @@ final_df$Time <- recode(final_df$Time, "t1"="t0", "t2"="t0", "t3"="t0")
 crew_phan_df <- final_df[final_df$group %in% c("Crew", "Phantom"), ]
 row.names(crew_phan_df) <- 1:nrow(crew_phan_df)
 crew_phan_df$Crew <- recode(crew_phan_df$group, "Crew"=1, "Phantom"=0)
-crew_phan_df$Time2 <- recode(crew_phan_df$Time, "t0"=0, "t12"=1, "t18"=0)
-crew_phan_df$Time3 <- recode(crew_phan_df$Time, "t0"=0, "t12"=0, "t18"=1)
+crew_phan_df$t12 <- recode(crew_phan_df$Time, "t0"=0, "t12"=1, "t18"=0)
+crew_phan_df$t18 <- recode(crew_phan_df$Time, "t0"=0, "t12"=0, "t18"=1)
 
-mod1 <- longCombat(idvar="subject_1", batchvar="scanner",
+mod1 <- longCombat(idvar="subject", batchvar="scanner",
  features=grep("vol_", names(crew_phan_df), value=TRUE),
- formula="Crew:Time2 + Crew:Time3", ranef="(1|subject_1)", data=crew_phan_df)
- #ranef="1 + (1|subject_1)" Probably not, since overall intercept isn't random
+ formula="Crew:t12 + Crew:t18", ranef="(1|subject)", data=crew_phan_df)
+ #ranef="1 + (1|subject)" Probably not, since overall intercept isn't random
  #Is the "Crew:" part necessary, since I coded it such that all phantom scans are at t0?
 
 data_combat <- mod1$data_combat
 data_combat <- data_combat[, subcortical]
 names(data_combat) <- paste0("combat_", names(data_combat))
 all_data <- cbind(crew_phan_df, data_combat)
-#all_data <- all_data[, c("subject_1", "Time", "scanner", "group", "sex", "age",
+#all_data <- all_data[, c("subject", "Time", "scanner", "group", "sex", "age",
 #  grep("combat_", names(all_data), value=TRUE))]
 tmp_data <- all_data
 all_data <- all_data[all_data$group == "Crew",]
 row.names(all_data) <- 1:nrow(all_data)
 
+write.csv(all_data, "~/Documents/nasa_antarctica/NASA/data/longCombatCrew.csv", row.names=FALSE)
+
 #### Plot to see if site effects gone
 for (region in grep("ol", names(all_data), value=TRUE)) {
   all_data[,paste0("perbase_", region)] <- NA
-  for (sub in unique(all_data$subject_1)) {
-    if ("t0" %in% all_data[all_data$subject_1 == sub, "Time"]) {
-      baseval <- all_data[all_data$subject_1 == sub & all_data$Time == "t0", region]
-      timepoints <- unique(all_data[all_data$subject_1 == sub, "Time"])
+  for (sub in unique(all_data$subject)) {
+    if ("t0" %in% all_data[all_data$subject == sub, "Time"]) {
+      baseval <- all_data[all_data$subject == sub & all_data$Time == "t0", region]
+      timepoints <- unique(all_data[all_data$subject == sub, "Time"])
       for (tp in timepoints) {
-        all_data[all_data$subject_1 == sub & all_data$Time == tp, paste0("perbase_", region)] <- all_data[all_data$subject_1 == sub & all_data$Time == tp, region]/baseval
+        all_data[all_data$subject == sub & all_data$Time == tp, paste0("perbase_", region)] <- all_data[all_data$subject == sub & all_data$Time == tp, region]/baseval
       }
     }
   }
 }
 
-crew_df <- reshape2::melt(all_data, c("subject_1", "Time", "scanner"),
+crew_df <- reshape2::melt(all_data, c("subject", "Time", "scanner"),
   c(paste0("perbase_combat_", subcortical), paste0("perbase_", subcortical)))
 names(crew_df) <- c("CrewMember", "Time", "Scanner", "Region", "PercentBase")
 crew_df$PercentBase <- crew_df$PercentBase*100
@@ -163,7 +171,7 @@ ggarrange(crew_raw_plot, crew_combat_plot, ncol=2)
 dev.off()
 
 ######### Not percent base values plot #########
-crew_values_df <- reshape2::melt(all_data, c("subject_1", "Time", "scanner"),
+crew_values_df <- reshape2::melt(all_data, c("subject", "Time", "scanner"),
   c(paste0("combat_", subcortical), subcortical))
 names(crew_values_df) <- c("CrewMember", "Time", "Scanner", "Region", "Values")
 crew_values_df$DataType <- c(rep("Combat", 448), rep("Raw", 448))
@@ -211,29 +219,48 @@ dev.off()
 
 
 results <- data.frame(Region=c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
-  "Pallidum", "Putamen", "Thalamus"), LongCombat_Coef_Time2=rep(NA, 7),
-  LongCombat_P_Time2=rep(NA, 7), LongCombat_Coef_Time3=rep(NA, 7),
-  LongCombat_P_Time3=rep(NA, 7), FixedScan_Coef_Time2=rep(NA, 7),
-  FixedScan_P_Time2=rep(NA, 7), FixedScan_Coef_Time3=rep(NA, 7),
-  FixedScan_P_Time3=rep(NA, 7), IndT_MeanDiff_Time2=rep(NA, 7),
-  IndT_P_Time2=rep(NA, 7), IndT_MeanDiff_Time3=rep(NA, 7), IndT_P_Time3=rep(NA, 7))
+  "Pallidum", "Putamen", "Thalamus"), LongCombat_Coef_t12=rep(NA, 7),
+  LongCombat_P_t12=rep(NA, 7), LongCombat_Coef_t18=rep(NA, 7),
+  LongCombat_P_t18=rep(NA, 7), FixedScan_Coef_t12=rep(NA, 7),
+  FixedScan_P_t12=rep(NA, 7), FixedScan_Coef_t18=rep(NA, 7),
+  FixedScan_P_t18=rep(NA, 7), IndT_MeanDiff_t12=rep(NA, 7),
+  IndT_P_t12=rep(NA, 7), IndT_MeanDiff_t18=rep(NA, 7), IndT_P_t18=rep(NA, 7))
 
 ######### Model with Combat Data #########
 
+subcortical_simp <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
+  "Pallidum", "Putamen", "Thalamus")
 for (i in 1:length(subcortical)) {
   region <- paste0("combat_", subcortical)[i]
-  time2_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time2")), data=all_data)
-  time23_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time2 + Time3")), data=all_data)
-  time3_mod <- lmer(formula(paste(region, "~ (1|subject_1) + Time3")), data=all_data)
+  names(all_data)[names(all_data) == region] <- subcortical_simp[i]
+
+  time2_mod <- lmer(formula(paste(subcortical_simp[i], "~ (1|subject) + t12")), data=all_data)
+  time23_mod <- lmer(formula(paste(subcortical_simp[i], "~ (1|subject) + t12 + t18")), data=all_data)
+  time3_mod <- lmer(formula(paste(subcortical_simp[i], "~ (1|subject) + t18")), data=all_data)
+  assign(paste0(region, "_time23_mod"), time23_mod)
+
+  names(all_data)[names(all_data) == subcortical_simp[i]] <- region
 
   ## Test if adding in Time 2 explains additional variance in within subject variability
-  results[i, "LongCombat_P_Time2"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
-  results[i, "LongCombat_Coef_Time2"] <- time23_mod@beta[2]
+  results[i, "LongCombat_P_t12"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
+  results[i, "LongCombat_Coef_t12"] <- time23_mod@beta[2]
 
   ## Test if adding in Time 3 explains additional variance in within subject variability
-  results[i, "LongCombat_P_Time3"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
-  results[i, "LongCombat_Coef_Time3"] <- time23_mod@beta[3]
+  results[i, "LongCombat_P_t18"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
+  results[i, "LongCombat_Coef_t18"] <- time23_mod@beta[3]
 }
+
+lme_table <- tab_model(combat_vol_miccai_ave_Accumbens_Area_time23_mod,
+  combat_vol_miccai_ave_Amygdala_time23_mod,
+  combat_vol_miccai_ave_Caudate_time23_mod,
+  combat_vol_miccai_ave_Hippocampus_time23_mod,
+  combat_vol_miccai_ave_Pallidum_time23_mod,
+  combat_vol_miccai_ave_Putamen_time23_mod,
+  combat_vol_miccai_ave_Thalamus_Proper_time23_mod,
+  p.val='kr')
+
+#save_html(lme_table, "lmeTable.html", background = "white",
+  libdir = "~/Documents/nasa_antarctica/NASA/tables/") #Not working
 
 ######### Model with Fixed Effect for Scanner in Raw Data #########
 
@@ -241,30 +268,30 @@ fe_data <- tmp_data
 
 for (i in 1:length(subcortical)) {
   region <- subcortical[i]
-  time2_mod <- lmer(formula(paste(region, "~ 1 + (1|subject_1) + Time2 + group")), data=fe_data) #Include "1 +"?
-  time23_mod <- lmer(formula(paste(region, "~ 1 + (1|subject_1) + Time2 + Time3 + group")), data=fe_data)
-  time3_mod <- lmer(formula(paste(region, "~ 1 + (1|subject_1) + Time3 + group")), data=fe_data)
+  time2_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12 + group")), data=fe_data) #Include "1 +"?
+  time23_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12 + t18 + group")), data=fe_data)
+  time3_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t18 + group")), data=fe_data)
 
   ## Test if adding in Time 2 explains additional variance in within subject variability
-  results[i, "FixedScan_P_Time2"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
-  results[i, "FixedScan_Coef_Time2"] <- time23_mod@beta[2]
+  results[i, "FixedScan_P_t12"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
+  results[i, "FixedScan_Coef_t12"] <- time23_mod@beta[2]
 
   ## Test if adding in Time 3 explains additional variance in within subject variability
-  results[i, "FixedScan_P_Time3"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
-  results[i, "FixedScan_Coef_Time3"] <- time23_mod@beta[3]
+  results[i, "FixedScan_P_t18"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
+  results[i, "FixedScan_Coef_t18"] <- time23_mod@beta[3]
 }
 
 results <- results[, 1:9]
 
 write.csv(results, file='~/Documents/nasa_antarctica/NASA/data/results/longCombat_vs_FixedScanner.csv', row.names=FALSE)
 
-resultsTime2 <- results[, c('Region', 'LongCombat_Coef_Time2', 'LongCombat_P_Time2')]
-resultsTime2$Time <- 't12'
-names(resultsTime2) <- c('Region', 'Coef', 'P', 'Time')
-resultsTime3 <- results[, c('Region', 'LongCombat_Coef_Time3', 'LongCombat_P_Time3')]
-resultsTime3$Time <- 't18'
-names(resultsTime3) <- c('Region', 'Coef', 'P', 'Time')
-longcombat_results <- rbind(resultsTime2, resultsTime3)
+resultst12 <- results[, c('Region', 'LongCombat_Coef_t12', 'LongCombat_P_t12')]
+resultst12$Time <- 't12'
+names(resultst12) <- c('Region', 'Coef', 'P', 'Time')
+resultst18 <- results[, c('Region', 'LongCombat_Coef_t18', 'LongCombat_P_t18')]
+resultst18$Time <- 't18'
+names(resultst18) <- c('Region', 'Coef', 'P', 'Time')
+longcombat_results <- rbind(resultst12, resultst18)
 
 longcombat_results$P_FDR <- p.adjust(longcombat_results$P, method='fdr')
 longcombat_results$P_FDR_NegLog10 <- -log10(longcombat_results$P_FDR)
@@ -272,7 +299,7 @@ longcombat_results$P_FDR_NegLog10 <- -log10(longcombat_results$P_FDR)
 
 ######### Independent Samples T-tests #########
 
-ind_data <- ind_data[, c("subject_1", "Time", "scanner", "group", subcortical)]
+ind_data <- ind_data[, c("subject", "Time", "scanner", "group", subcortical)]
 # TO DO
 
 ################################ Brain Figure ################################
