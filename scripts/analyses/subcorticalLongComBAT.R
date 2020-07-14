@@ -2,7 +2,7 @@
 ### a stay in Antarctica, using longitudinal combat to address site effects
 ###
 ### Ellyn Butler
-### May 28, 2020 - June 12, 2020
+### May 28, 2020 - July 13, 2020
 
 library('miceadds')
 library('ggplot2')
@@ -14,7 +14,9 @@ library('pbkrtest')
 library('R.utils')
 library('TMB')
 library('sjPlot')
-library('tableHTML')
+#library('tableHTML')
+library('kableExtra')
+#library('xtable')
 source.all('~/Documents/longCombat/R')
 
 set.seed(20)
@@ -257,10 +259,12 @@ lme_table <- tab_model(combat_vol_miccai_ave_Accumbens_Area_time23_mod,
   combat_vol_miccai_ave_Pallidum_time23_mod,
   combat_vol_miccai_ave_Putamen_time23_mod,
   combat_vol_miccai_ave_Thalamus_Proper_time23_mod,
-  p.val='kr')
+  p.val='kr', file="~/Documents/nasa_antarctica/NASA/tables/lmeTable")
+
+xtable(lme_table, type = "html", file = "~/Documents/nasa_antarctica/NASA/tables/lmeTable.htm")
 
 #save_html(lme_table, "lmeTable.html", background = "white",
-  libdir = "~/Documents/nasa_antarctica/NASA/tables/") #Not working
+#  libdir = "~/Documents/nasa_antarctica/NASA/tables/") #Not working
 
 ######### Model with Fixed Effect for Scanner in Raw Data #########
 
