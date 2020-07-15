@@ -79,9 +79,11 @@ crew_phan_df$Crew <- recode(crew_phan_df$group, "Crew"=1, "Phantom"=0)
 crew_phan_df$t12 <- recode(crew_phan_df$Time, "t0"=0, "t12"=1, "t18"=0)
 crew_phan_df$t18 <- recode(crew_phan_df$Time, "t0"=0, "t12"=0, "t18"=1)
 
+write.csv(crew_phan_df, '~/Documents/nasa_antarctica/NASA/data/dataForLongCombat.csv', row.names=FALSE)
+
 mod1 <- longCombat(idvar="subject", batchvar="scanner",
  features=grep("vol_", names(crew_phan_df), value=TRUE),
- formula="Crew:t12 + Crew:t18", ranef="(1|subject)", data=crew_phan_df)
+ formula="t12 + t18", ranef="(1|subject)", data=crew_phan_df)
  #ranef="1 + (1|subject)" Probably not, since overall intercept isn't random
  #Is the "Crew:" part necessary, since I coded it such that all phantom scans are at t0?
 
