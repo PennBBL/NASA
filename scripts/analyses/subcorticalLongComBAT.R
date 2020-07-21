@@ -2,7 +2,7 @@
 ### a stay in Antarctica, using longitudinal combat to address site effects
 ###
 ### Ellyn Butler
-### May 28, 2020 - July 13, 2020
+### May 28, 2020 - July 17, 2020
 
 library('miceadds')
 library('ggplot2')
@@ -17,7 +17,8 @@ library('sjPlot')
 #library('tableHTML')
 library('kableExtra')
 #library('xtable')
-source.all('~/Documents/longCombat/R')
+#('longCombat')
+source.all('~/Documents/longCombat/R/')
 
 set.seed(20)
 
@@ -178,7 +179,8 @@ dev.off()
 crew_values_df <- reshape2::melt(all_data, c("subject", "Time", "scanner"),
   c(paste0("combat_", subcortical), subcortical))
 names(crew_values_df) <- c("CrewMember", "Time", "Scanner", "Region", "Values")
-crew_values_df$DataType <- c(rep("Combat", 448), rep("Raw", 448))
+crew_values_df$DataType <- c(rep("After Longitudinal ComBat Adjustment", 448),
+  rep("Before Longitudinal ComBat Adjustment", 448))
 
 for (i in 1:nrow(crew_values_df)) {
   crewmem <- crew_values_df[i, "CrewMember"]
@@ -214,7 +216,7 @@ crew_values_plot <- ggplot(crew_values_df, aes(x=Time, y=Values, color=ScannerOr
       "gray", "black")) + theme(legend.position="bottom") +
     guides(color=guide_legend(title="Scanner Order"))
 
-pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombat_values.pdf", width=12, height=12)
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombat_values.pdf", width=8, height=8)
 crew_values_plot
 dev.off()
 
