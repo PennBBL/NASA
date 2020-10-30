@@ -4,19 +4,21 @@
 ### Ellyn Butler
 ### May 28, 2020 - July 17, 2020
 
-library('miceadds')
-library('ggplot2')
-library('ggseg')
-library('ggpubr')
-library('dplyr')
-library('lme4')
-library('pbkrtest')
-library('R.utils')
-library('TMB')
-library('sjPlot')
+library('miceadds') # v 3.10-28
+library('ggplot2') # v 3.3.2
+library('ggseg') # v 1.1.5
+library('ggpubr') # v 0.4.0
+library('dplyr') # v 1.0.2
+library('lme4') # v 1.1-23
+library('pbkrtest') # v 0.4-8.6
+library('R.utils') # v 2.10.1
+library('TMB') # v 1.7.18
+library('sjPlot') # v 2.8.4
 #library('tableHTML')
-library('kableExtra')
+library('kableExtra') # v 1.3.1
 #library('xtable')
+library('ggrepel') # v 0.8.2
+library('tidyverse') # v 1.3.0
 #('longCombat')
 source.all('~/Documents/longCombat/R/')
 
@@ -212,8 +214,8 @@ crew_values_plot <- ggplot(crew_values_df, aes(x=Time, y=Values, color=ScannerOr
       group=CrewMember)) +
     theme_linedraw() + geom_line() + facet_grid(DataType ~ Region, scales="free_y") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-    scale_color_manual(values = c("blue", "blue", "red", "red", "red", "gray40",
-      "gray", "black")) + theme(legend.position="bottom") +
+    scale_color_manual(values = c("blue", "blue", "red", "red", "red", "springgreen1",
+      "springgreen3", "springgreen4")) + theme(legend.position="bottom") +
     guides(color=guide_legend(title="Scanner Order"))
 
 pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombat_values.pdf", width=8, height=8)
@@ -272,13 +274,15 @@ xtable(lme_table, type = "html", file = "~/Documents/nasa_antarctica/NASA/tables
 
 ######### Model with Fixed Effect for Scanner in Raw Data #########
 
-fe_data <- tmp_data
+#fe_data <- tmp_data # This includes phantoms, which should not be in the final analysis
 
 for (i in 1:length(subcortical)) {
   region <- subcortical[i]
-  time2_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12 + group")), data=fe_data) #Include "1 +"?
-  time23_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12 + t18 + group")), data=fe_data)
-  time3_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t18 + group")), data=fe_data)
+  # October 30, 2020: Switched analyses to match paper, i.e., excluded phantoms
+  # and group indicator
+  time2_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12")), data=all_data) #Include "1 +"?
+  time23_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12 + t18")), data=all_data)
+  time3_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t18")), data=all_data)
 
   ## Test if adding in Time 2 explains additional variance in within subject variability
   results[i, "FixedScan_P_t12"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
@@ -312,43 +316,53 @@ ind_data <- ind_data[, c("subject", "Time", "scanner", "group", subcortical)]
 
 ################################ Brain Figure ################################
 
-longcombat_results$area <- recode(longcombat_results$Region,
+longcombat_results$region <- recode(longcombat_results$Region,
   "Hippocampus"="hippocampus", "Thalamus"="thalamus proper", "Putamen"="putamen",
   "Amygdala"="amygdala", "Pallidum"="pallidum", "Caudate"="caudate")
 
 aseg_t12 <- aseg
 for (i in 1:nrow(aseg_t12)) {
-  thisarea <- as.character(aseg_t12[i, 'area'])
-  if (thisarea %in% longcombat_results$area) {
-    aseg_t12[i, 'P_FDR_NegLog10'] <- longcombat_results[longcombat_results$area == thisarea &
+  thisarea <- as.character(aseg_t12[i, 'region'])
+  if (thisarea %in% longcombat_results$region) {
+    aseg_t12[i, 'P_FDR_NegLog10'] <- longcombat_results[longcombat_results$region == thisarea &
       longcombat_results$Time == 't12', 'P_FDR_NegLog10']
   }
 }
 aseg_t18 <- aseg
 for (i in 1:nrow(aseg_t18)) {
-  thisarea <- as.character(aseg_t18[i, 'area'])
-  if (thisarea %in% longcombat_results$area) {
-    aseg_t18[i, 'P_FDR_NegLog10'] <- longcombat_results[longcombat_results$area == thisarea &
+  thisarea <- as.character(aseg_t18[i, 'region'])
+  if (thisarea %in% longcombat_results$region) {
+    aseg_t18[i, 'P_FDR_NegLog10'] <- longcombat_results[longcombat_results$region == thisarea &
       longcombat_results$Time == 't18', 'P_FDR_NegLog10']
   }
 }
 
-p_t12 <- ggseg(aseg_t12, atlas="aseg", hemisphere=c("left", "right"),
+aseg_t12_nona <- aseg_t12[!is.na(aseg_t12$P_FDR_NegLog10), ]
+aseg_t18_nona <- aseg_t18[!is.na(aseg_t18$P_FDR_NegLog10), ]
+
+labels <- aseg[aseg$hemi == "right" & aseg$region %in% aseg_t12_nona$region, ] %>%
+  unnest(cols = ggseg) %>%
+  group_by(region) %>%
+  summarise(.lat =  mean(.lat), .long = mean(.long))
+
+p_t12 <- ggseg(aseg_t12_nona, atlas="aseg", hemisphere=c("left", "right"),
   mapping=aes(fill=P_FDR_NegLog10), size=.1, colour="black") +
   labs(fill=expression(-log[10]*"p-value")) +
   scale_fill_gradient(low="lavenderblush1", high="red3", limits=c(0, 5)) +
-  theme(text=element_text(size=14), axis.title.x=element_blank(),
-    axis.text.x=element_blank()) +
-  ggtitle("Effect Immediately After Antarctica (t12)")
+  theme(text=element_text(size=14)) +
+  ggtitle("Effect Immediately After Antarctica (t12)") +
+  ggrepel::geom_label_repel(data = labels, inherit.aes = FALSE, size=3,
+    mapping = aes(x = .long, y=.lat, label=region))
 
-p_t18 <- ggseg(aseg_t18, atlas="aseg", hemisphere=c("left", "right"),
+p_t18 <- ggseg(aseg_t18_nona, atlas="aseg", hemisphere=c("left", "right"),
   mapping=aes(fill=P_FDR_NegLog10), size=.1, colour="black") +
   labs(fill=expression(-log[10]*"p-value")) +
   scale_fill_gradient(low="lavenderblush1", high="red3", limits=c(0, 5)) +
-  theme(text=element_text(size=14), axis.title.x=element_blank(),
-    axis.text.x=element_blank()) + #, family="Arial"
-  ggtitle("Effect Six Months After Antarctica (t18)")
+  theme(text=element_text(size=14)) +
+  ggtitle("Effect Six Months After Antarctica (t18)") +
+  ggrepel::geom_label_repel(data = labels, inherit.aes = FALSE, size=3,
+    mapping = aes(x = .long, y=.lat, label=region))
 
-pdf(file="~/Documents/nasa_antarctica/NASA/plots/ggsegNegLogP.pdf", width=14, height=5)
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/ggsegNegLogP.pdf", width=14, height=6)
 ggarrange(p_t12, p_t18, ncol=2)
 dev.off()
