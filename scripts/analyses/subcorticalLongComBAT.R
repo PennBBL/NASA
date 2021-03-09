@@ -3,19 +3,20 @@
 ###
 ### Ellyn Butler
 ### May 28, 2020 - July 17, 2020
+### March 8, 2021: Switch small cortical regions to lobes for analysis purposes
 
-library('miceadds') # v 3.10-28
+library('miceadds') # v 3.10-28... 3.11-6
 library('ggplot2') # v 3.3.2
-library('ggseg') # v 1.1.5
+library('ggseg') # v 1.1.5... 1.6.00
 library('ggpubr') # v 0.4.0
 library('dplyr') # v 1.0.2
-library('lme4') # v 1.1-23
-library('pbkrtest') # v 0.4-8.6
+library('lme4') # v 1.1-23... 1.1-26
+library('pbkrtest') # v 0.4-8.6... 0.5-0.1
 library('R.utils') # v 2.10.1
-library('TMB') # v 1.7.18
-library('sjPlot') # v 2.8.4
+library('TMB') # v 1.7.18... 1.7.19 (NOT WORKING March 8, 2021)
+library('sjPlot') # v 2.8.4... 2.8.6
 #library('tableHTML')
-library('kableExtra') # v 1.3.1
+library('kableExtra') # v 1.3.1... 1.3.4
 #library('xtable')
 library('ggrepel') # v 0.8.2
 library('tidyverse') # v 1.3.0
@@ -43,8 +44,11 @@ names(demo_df) <- c("subject", "Time", "sex", "age")
 subcortical <- c("vol_miccai_ave_Accumbens_Area", "vol_miccai_ave_Amygdala",
   "vol_miccai_ave_Caudate", "vol_miccai_ave_Hippocampus", "vol_miccai_ave_Pallidum",
   "vol_miccai_ave_Putamen", "vol_miccai_ave_Thalamus_Proper")
-vol_df <- vol_df[, c("subject", "Time", "scanner", "group",
-  grep("_ave_", names(vol_df), value=TRUE))]
+vol_df$Frontal_Vol <- vol_df$FrontOrb_Vol + vol_df$FrontDors_Vol
+vol_df <- vol_df[, !(names(vol_df) %in% c("FrontOrb_Vol", "FrontDors_Vol"))]
+cortical <- grep("_Vol", names(vol_df), value=TRUE)[!(grep("_Vol", names(vol_df), value=TRUE) %in% c("BasGang_Vol", "Limbic_Vol"))]
+vol_df <- vol_df[, c("subject", "Time", "scanner", "group", subcortical, cortical)]
+  #grep("_ave_", names(vol_df), value=TRUE)
 
 # Subset params
 params_df$combo <- paste(params_df$scanner, params_df$dx, params_df$dy, params_df$dz,
@@ -84,14 +88,15 @@ crew_phan_df$t18 <- recode(crew_phan_df$Time, "t0"=0, "t12"=0, "t18"=1)
 
 write.csv(crew_phan_df, '~/Documents/nasa_antarctica/NASA/data/dataForLongCombat.csv', row.names=FALSE)
 
+
 mod1 <- longCombat(idvar="subject", batchvar="scanner",
- features=grep("vol_", names(crew_phan_df), value=TRUE),
+ features=c(subcortical, cortical),
  formula="t12 + t18", ranef="(1|subject)", data=crew_phan_df)
  #ranef="1 + (1|subject)" Probably not, since overall intercept isn't random
  #Is the "Crew:" part necessary, since I coded it such that all phantom scans are at t0?
 
 data_combat <- mod1$data_combat
-data_combat <- data_combat[, subcortical]
+data_combat <- data_combat[, c(subcortical, cortical)]
 names(data_combat) <- paste0("combat_", names(data_combat))
 all_data <- cbind(crew_phan_df, data_combat)
 #all_data <- all_data[, c("subject", "Time", "scanner", "group", "sex", "age",
@@ -100,7 +105,7 @@ tmp_data <- all_data
 all_data <- all_data[all_data$group == "Crew",]
 row.names(all_data) <- 1:nrow(all_data)
 
-write.csv(all_data, "~/Documents/nasa_antarctica/NASA/data/longCombatCrew.csv", row.names=FALSE)
+write.csv(all_data, paste0("~/Documents/nasa_antarctica/NASA/data/longCombatCrew_", Sys.Date(), ".csv"), row.names=FALSE)
 
 #### Plot to see if site effects gone
 for (region in grep("ol", names(all_data), value=TRUE)) {
@@ -117,7 +122,8 @@ for (region in grep("ol", names(all_data), value=TRUE)) {
 }
 
 crew_df <- reshape2::melt(all_data, c("subject", "Time", "scanner"),
-  c(paste0("perbase_combat_", subcortical), paste0("perbase_", subcortical)))
+  c(paste0("perbase_combat_", c(subcortical, cortical)),
+  paste0("perbase_", c(subcortical, cortical))))
 names(crew_df) <- c("CrewMember", "Time", "Scanner", "Region", "PercentBase")
 crew_df$PercentBase <- crew_df$PercentBase*100
 
@@ -131,8 +137,7 @@ for (i in 1:nrow(crew_df)) {
 crew_df$ScannerOrder <- ordered(crew_df$ScannerOrder, c("CGN-HOB-CGN", "CGN-HOB",
   "CGN-CHR-CGN", "CGN-CHR", "CGN", "CHR-CGN", "HOB-CHR", "HOB-CGN"))
 
-crew_combat_df <- crew_df[crew_df$Region %in% grep("combat",
-  crew_df$Region, value=TRUE),]
+crew_combat_df <- crew_df[crew_df$Region %in% grep("combat", crew_df$Region, value=TRUE),]
 crew_combat_df$Region <- recode(crew_combat_df$Region,
     "perbase_combat_vol_miccai_ave_Accumbens_Area"="Accumbens",
     "perbase_combat_vol_miccai_ave_Amygdala"="Amygdala",
@@ -140,7 +145,11 @@ crew_combat_df$Region <- recode(crew_combat_df$Region,
     "perbase_combat_vol_miccai_ave_Hippocampus"="Hippocampus",
     "perbase_combat_vol_miccai_ave_Pallidum"="Pallidum",
     "perbase_combat_vol_miccai_ave_Putamen"="Putamen",
-    "perbase_combat_vol_miccai_ave_Thalamus_Proper"="Thalamus")
+    "perbase_combat_vol_miccai_ave_Thalamus_Proper"="Thalamus",
+    "perbase_combat_Frontal_Vol"="Frontal",
+    "perbase_combat_Temporal_Vol"="Temporal",
+    "perbase_combat_Parietal_Vol"="Parietal",
+    "perbase_combat_Occipital_Vol"="Occipital")
 
 crew_raw_df <- crew_df[!(crew_df$Region %in% grep("combat",
   crew_df$Region, value=TRUE)),]
@@ -151,38 +160,54 @@ crew_raw_df$Region <- recode(crew_raw_df$Region,
     "perbase_vol_miccai_ave_Hippocampus"="Hippocampus",
     "perbase_vol_miccai_ave_Pallidum"="Pallidum",
     "perbase_vol_miccai_ave_Putamen"="Putamen",
-    "perbase_vol_miccai_ave_Thalamus_Proper"="Thalamus")
+    "perbase_vol_miccai_ave_Thalamus_Proper"="Thalamus",
+    "perbase_Frontal_Vol"="Frontal",
+    "perbase_Temporal_Vol"="Temporal",
+    "perbase_Parietal_Vol"="Parietal",
+    "perbase_Occipital_Vol"="Occipital")
 
-crew_combat_plot <- ggplot(crew_combat_df, aes(x=Time, y=PercentBase, color=ScannerOrder,
-      group=CrewMember)) + ylim(70, 130) +
-    theme_linedraw() + geom_line() + facet_grid(. ~ Region) +
+subcort <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus", "Pallidum",
+  "Putamen", "Thalamus")
+cort <- c("Frontal", "Temporal", "Parietal", "Occipital")
+for (type in c("subcort", "cort")) {
+  crew_combat_plot <- ggplot(crew_combat_df[crew_combat_df$Region %in% get(type), ],
+      aes(x=Time, y=PercentBase, color=ScannerOrder, group=CrewMember)) +
+    ylim(70, 130) + theme_linedraw() + geom_line() + facet_grid(. ~ Region) +
     ylab("% Baseline") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_color_manual(values = c("blue", "blue", "red", "red", "red", "gray40",
       "gray", "black")) +
     ggtitle(expression(paste(bold("After"), " Longitudinal ComBat Adjustment"))) +
     theme(legend.position="bottom") +
     guides(color=guide_legend(title="Scanner Order"))
+  assign(paste0(type, "_crew_combat_plot"), crew_combat_plot)
 
-crew_raw_plot <- ggplot(crew_raw_df, aes(x=Time, y=PercentBase, color=ScannerOrder,
-      group=CrewMember)) + ylim(70, 130) +
-    theme_linedraw() + geom_line() + facet_grid(. ~ Region) +
+  crew_nocombat_plot <- ggplot(crew_raw_df[crew_combat_df$Region %in% get(type), ],
+      aes(x=Time, y=PercentBase, color=ScannerOrder, group=CrewMember)) +
+    ylim(70, 130) + theme_linedraw() + geom_line() + facet_grid(. ~ Region) +
     ylab("% Baseline") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_color_manual(values = c("blue", "blue", "red", "red", "red", "gray40",
       "gray", "black")) +
     ggtitle(expression(paste(bold("Before"), " Longitudinal ComBat Adjustment"))) +
     theme(legend.position="bottom") +
     guides(color=guide_legend(title="Scanner Order"))
+  assign(paste0(type, "_crew_nocombat_plot"), crew_nocombat_plot)
+}
 
-pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombat.pdf", width=14, height=5)
-ggarrange(crew_raw_plot, crew_combat_plot, ncol=2)
+
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombatSubcortical.pdf", width=14, height=5)
+ggarrange(subcort_crew_nocombat_plot, subcort_crew_combat_plot, ncol=2)
 dev.off()
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombatCortical.pdf", width=14, height=5)
+ggarrange(cort_crew_nocombat_plot, cort_crew_combat_plot, ncol=2)
+dev.off()
+
 
 ######### Not percent base values plot #########
 crew_values_df <- reshape2::melt(all_data, c("subject", "Time", "scanner"),
-  c(paste0("combat_", subcortical), subcortical))
+  c(paste0("combat_", c(subcortical, cortical)), c(subcortical, cortical)))
 names(crew_values_df) <- c("CrewMember", "Time", "Scanner", "Region", "Values")
-crew_values_df$DataType <- c(rep("After Longitudinal ComBat Adjustment", 448),
-  rep("Before Longitudinal ComBat Adjustment", 448))
+crew_values_df$DataType <- c(rep("After Longitudinal ComBat Adjustment", nrow(crew_values_df)/2),
+  rep("Before Longitudinal ComBat Adjustment", nrow(crew_values_df)/2))
 
 for (i in 1:nrow(crew_values_df)) {
   crewmem <- crew_values_df[i, "CrewMember"]
@@ -202,13 +227,21 @@ crew_values_df$Region <- recode(crew_values_df$Region,
     "vol_miccai_ave_Pallidum"="Pallidum",
     "vol_miccai_ave_Putamen"="Putamen",
     "vol_miccai_ave_Thalamus_Proper"="Thalamus",
+    "combat_Frontal_Vol"="Frontal",
+    "combat_Temporal_Vol"="Temporal",
+    "combat_Parietal_Vol"="Parietal",
+    "combat_Occipital_Vol"="Occipital",
     "combat_vol_miccai_ave_Accumbens_Area"="Accumbens",
     "combat_vol_miccai_ave_Amygdala"="Amygdala",
     "combat_vol_miccai_ave_Caudate"="Caudate",
     "combat_vol_miccai_ave_Hippocampus"="Hippocampus",
     "combat_vol_miccai_ave_Pallidum"="Pallidum",
     "combat_vol_miccai_ave_Putamen"="Putamen",
-    "combat_vol_miccai_ave_Thalamus_Proper"="Thalamus")
+    "combat_vol_miccai_ave_Thalamus_Proper"="Thalamus",
+    "combat_Frontal_Vol"="Frontal",
+    "combat_Temporal_Vol"="Temporal",
+    "combat_Parietal_Vol"="Parietal",
+    "combat_Occipital_Vol"="Occipital")
 
 crew_values_plot <- ggplot(crew_values_df, aes(x=Time, y=Values, color=ScannerOrder,
       group=CrewMember)) +
