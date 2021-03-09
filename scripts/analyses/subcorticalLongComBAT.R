@@ -15,12 +15,14 @@ library('pbkrtest') # v 0.4-8.6... 0.5-0.1
 library('R.utils') # v 2.10.1
 library('TMB') # v 1.7.18... 1.7.19 (NOT WORKING March 8, 2021)
 library('sjPlot') # v 2.8.4... 2.8.6
-#library('tableHTML')
 library('kableExtra') # v 1.3.1... 1.3.4
-#library('xtable')
 library('ggrepel') # v 0.8.2
 library('tidyverse') # v 1.3.0
-#('longCombat')
+library('cowplot')
+
+#library('xtable')
+#library('longCombat')
+#library('tableHTML')
 source.all('~/Documents/longCombat/R/')
 
 set.seed(20)
@@ -227,10 +229,10 @@ crew_values_df$Region <- recode(crew_values_df$Region,
     "vol_miccai_ave_Pallidum"="Pallidum",
     "vol_miccai_ave_Putamen"="Putamen",
     "vol_miccai_ave_Thalamus_Proper"="Thalamus",
-    "combat_Frontal_Vol"="Frontal",
-    "combat_Temporal_Vol"="Temporal",
-    "combat_Parietal_Vol"="Parietal",
-    "combat_Occipital_Vol"="Occipital",
+    "Frontal_Vol"="Frontal",
+    "Temporal_Vol"="Temporal",
+    "Parietal_Vol"="Parietal",
+    "Occipital_Vol"="Occipital",
     "combat_vol_miccai_ave_Accumbens_Area"="Accumbens",
     "combat_vol_miccai_ave_Amygdala"="Amygdala",
     "combat_vol_miccai_ave_Caudate"="Caudate",
@@ -243,44 +245,53 @@ crew_values_df$Region <- recode(crew_values_df$Region,
     "combat_Parietal_Vol"="Parietal",
     "combat_Occipital_Vol"="Occipital")
 
-crew_values_plot <- ggplot(crew_values_df, aes(x=Time, y=Values, color=ScannerOrder,
-      group=CrewMember)) +
+subcort_crew_values_plot <- ggplot(crew_values_df[crew_values_df$Region %in% subcort, ],
+      aes(x=Time, y=Values, color=ScannerOrder, group=CrewMember)) +
+    theme_linedraw() + geom_line() + facet_grid(DataType ~ Region, scales="free_y") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_color_manual(values = c("blue", "blue", "red", "red", "red", "springgreen1",
+      "springgreen3", "springgreen4")) + theme(legend.position="bottom") +
+    guides(color=guide_legend(title="Scanner Order"))
+cort_crew_values_plot <- ggplot(crew_values_df[crew_values_df$Region %in% cort, ],
+      aes(x=Time, y=Values, color=ScannerOrder, group=CrewMember)) +
     theme_linedraw() + geom_line() + facet_grid(DataType ~ Region, scales="free_y") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_color_manual(values = c("blue", "blue", "red", "red", "red", "springgreen1",
       "springgreen3", "springgreen4")) + theme(legend.position="bottom") +
     guides(color=guide_legend(title="Scanner Order"))
 
-pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombat_values.pdf", width=8, height=8)
-crew_values_plot
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombatSubcortical_values.pdf", width=8, height=8)
+subcort_crew_values_plot
 dev.off()
-
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/beforeAndAfterCombatCortical_values.pdf", width=8, height=8)
+cort_crew_values_plot
+dev.off()
 
 ################################### Model ###################################
 
-
-results <- data.frame(Region=c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
-  "Pallidum", "Putamen", "Thalamus"), LongCombat_Coef_t12=rep(NA, 7),
-  LongCombat_P_t12=rep(NA, 7), LongCombat_Coef_t18=rep(NA, 7),
-  LongCombat_P_t18=rep(NA, 7), FixedScan_Coef_t12=rep(NA, 7),
-  FixedScan_P_t12=rep(NA, 7), FixedScan_Coef_t18=rep(NA, 7),
-  FixedScan_P_t18=rep(NA, 7), IndT_MeanDiff_t12=rep(NA, 7),
-  IndT_P_t12=rep(NA, 7), IndT_MeanDiff_t18=rep(NA, 7), IndT_P_t18=rep(NA, 7))
+simp <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
+  "Pallidum", "Putamen", "Thalamus", "Frontal", "Temporal", "Parietal", "Occipital")
+results <- data.frame(Region=simp, LongCombat_Coef_t12=rep(NA, length(simp)),
+  LongCombat_P_t12=rep(NA, length(simp)), LongCombat_Coef_t18=rep(NA, length(simp)),
+  LongCombat_P_t18=rep(NA, length(simp)), FixedScan_Coef_t12=rep(NA, length(simp)),
+  FixedScan_P_t12=rep(NA, length(simp)), FixedScan_Coef_t18=rep(NA, length(simp)),
+  FixedScan_P_t18=rep(NA, length(simp)), IndT_MeanDiff_t12=rep(NA, length(simp)),
+  IndT_P_t12=rep(NA, length(simp)), IndT_MeanDiff_t18=rep(NA, length(simp)),
+  IndT_P_t18=rep(NA, length(simp)))
 
 ######### Model with Combat Data #########
 
-subcortical_simp <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
-  "Pallidum", "Putamen", "Thalamus")
-for (i in 1:length(subcortical)) {
-  region <- paste0("combat_", subcortical)[i]
-  names(all_data)[names(all_data) == region] <- subcortical_simp[i]
 
-  time2_mod <- lmer(formula(paste(subcortical_simp[i], "~ (1|subject) + t12")), data=all_data)
-  time23_mod <- lmer(formula(paste(subcortical_simp[i], "~ (1|subject) + t12 + t18")), data=all_data)
-  time3_mod <- lmer(formula(paste(subcortical_simp[i], "~ (1|subject) + t18")), data=all_data)
+for (i in 1:length(c(subcortical, cortical))) {
+  region <- paste0("combat_", c(subcortical, cortical))[i]
+  names(all_data)[names(all_data) == region] <- simp[i]
+
+  time2_mod <- lmer(formula(paste(simp[i], "~ (1|subject) + t12")), data=all_data)
+  time23_mod <- lmer(formula(paste(simp[i], "~ (1|subject) + t12 + t18")), data=all_data)
+  time3_mod <- lmer(formula(paste(simp[i], "~ (1|subject) + t18")), data=all_data)
   assign(paste0(region, "_time23_mod"), time23_mod)
 
-  names(all_data)[names(all_data) == subcortical_simp[i]] <- region
+  names(all_data)[names(all_data) == simp[i]] <- region
 
   ## Test if adding in Time 2 explains additional variance in within subject variability
   results[i, "LongCombat_P_t12"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
@@ -291,26 +302,25 @@ for (i in 1:length(subcortical)) {
   results[i, "LongCombat_Coef_t18"] <- time23_mod@beta[3]
 }
 
-lme_table <- tab_model(combat_vol_miccai_ave_Accumbens_Area_time23_mod,
+print(tab_model(combat_vol_miccai_ave_Accumbens_Area_time23_mod,
   combat_vol_miccai_ave_Amygdala_time23_mod,
   combat_vol_miccai_ave_Caudate_time23_mod,
   combat_vol_miccai_ave_Hippocampus_time23_mod,
   combat_vol_miccai_ave_Pallidum_time23_mod,
   combat_vol_miccai_ave_Putamen_time23_mod,
   combat_vol_miccai_ave_Thalamus_Proper_time23_mod,
-  p.val='kr', file="~/Documents/nasa_antarctica/NASA/tables/lmeTable")
+  combat_Frontal_Vol_time23_mod, combat_Parietal_Vol_time23_mod,
+  combat_Occipital_Vol_time23_mod, combat_Temporal_Vol_time23_mod, show.ci=FALSE,
+  p.val='kr', p.adjust='fdr', file="~/Documents/nasa_antarctica/NASA/tables/lmeTable.html"))
 
-xtable(lme_table, type = "html", file = "~/Documents/nasa_antarctica/NASA/tables/lmeTable.htm")
 
-#save_html(lme_table, "lmeTable.html", background = "white",
-#  libdir = "~/Documents/nasa_antarctica/NASA/tables/") #Not working
 
 ######### Model with Fixed Effect for Scanner in Raw Data #########
 
 #fe_data <- tmp_data # This includes phantoms, which should not be in the final analysis
 
-for (i in 1:length(subcortical)) {
-  region <- subcortical[i]
+for (i in 1:length(c(subcortical, cortical))) {
+  region <- c(subcortical, cortical)[i]
   # October 30, 2020: Switched analyses to match paper, i.e., excluded phantoms
   # and group indicator
   time2_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12")), data=all_data) #Include "1 +"?
@@ -349,10 +359,18 @@ ind_data <- ind_data[, c("subject", "Time", "scanner", "group", subcortical)]
 
 ################################ Brain Figure ################################
 
+longcombat_results <- longcombat_results[longcombat_results$Region %in% subcort, ]
+row.names(longcombat_results) <- 1:nrow(longcombat_results)
+
 longcombat_results$region <- recode(longcombat_results$Region,
   "Hippocampus"="hippocampus", "Thalamus"="thalamus proper", "Putamen"="putamen",
   "Amygdala"="amygdala", "Pallidum"="pallidum", "Caudate"="caudate")
 
+
+
+
+
+aseg <- as_ggseg_atlas(aseg)
 aseg_t12 <- aseg
 for (i in 1:nrow(aseg_t12)) {
   thisarea <- as.character(aseg_t12[i, 'region'])
@@ -373,29 +391,36 @@ for (i in 1:nrow(aseg_t18)) {
 aseg_t12_nona <- aseg_t12[!is.na(aseg_t12$P_FDR_NegLog10), ]
 aseg_t18_nona <- aseg_t18[!is.na(aseg_t18$P_FDR_NegLog10), ]
 
-labels <- aseg[aseg$hemi == "right" & aseg$region %in% aseg_t12_nona$region, ] %>%
+region_labels <- aseg[aseg$hemi == "right" & aseg$region %in% aseg_t12_nona$region, ] %>%
   unnest(cols = ggseg) %>%
   group_by(region) %>%
   summarise(.lat =  mean(.lat), .long = mean(.long))
 
 p_t12 <- ggseg(aseg_t12_nona, atlas="aseg", hemisphere=c("left", "right"),
-  mapping=aes(fill=P_FDR_NegLog10), size=.1, colour="black") +
+  mapping=aes(fill=P_FDR_NegLog10), size=.1, colour="black") + theme_void() +
   labs(fill=expression(-log[10]*"p-value")) +
   scale_fill_gradient(low="lavenderblush1", high="red3", limits=c(0, 5)) +
   theme(text=element_text(size=14)) +
-  ggtitle("Effect Immediately After Antarctica (t12)") +
-  ggrepel::geom_label_repel(data = labels, inherit.aes = FALSE, size=3,
+  ggtitle("     Effect Immediately After Antarctica (t12)") +
+  ggrepel::geom_label_repel(data = region_labels, inherit.aes = FALSE, size=3,
     mapping = aes(x = .long, y=.lat, label=region))
 
 p_t18 <- ggseg(aseg_t18_nona, atlas="aseg", hemisphere=c("left", "right"),
-  mapping=aes(fill=P_FDR_NegLog10), size=.1, colour="black") +
-  labs(fill=expression(-log[10]*"p-value")) +
+  mapping=aes(fill=P_FDR_NegLog10), size=.1, colour="black") + theme_void() +
   scale_fill_gradient(low="lavenderblush1", high="red3", limits=c(0, 5)) +
-  theme(text=element_text(size=14)) +
-  ggtitle("Effect Six Months After Antarctica (t18)") +
-  ggrepel::geom_label_repel(data = labels, inherit.aes = FALSE, size=3,
+  theme(text=element_text(size=14), legend.position="none") +
+  ggtitle("     Effect Six Months After Antarctica (t18)") +
+  ggrepel::geom_label_repel(data = region_labels, inherit.aes = FALSE, size=3,
     mapping = aes(x = .long, y=.lat, label=region))
 
-pdf(file="~/Documents/nasa_antarctica/NASA/plots/ggsegNegLogP.pdf", width=14, height=6)
-ggarrange(p_t12, p_t18, ncol=2)
+plot_legend <- get_legend(p_t12)
+p_t12 <- p_t12 + theme(legend.position="none")
+
+combat_plot <- cowplot::plot_grid(
+  cowplot::plot_grid(p_t12, p_t18, labels=c('A', 'B'), ncol=2),
+  plot_legend, rel_widths=c(6, 1), nrow=1, ncol=2)
+
+
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/ggsegNegLogP.pdf", width=15, height=6)
+combat_plot
 dev.off()

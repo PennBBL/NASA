@@ -12,13 +12,12 @@ library('reshape2')
 df <- read.csv('~/Documents/nasa_antarctica/NASA/data/dataForLongCombat.csv')
 subcortical <- paste0('vol_miccai_ave_', c('Accumbens_Area', 'Amygdala',
   'Caudate', 'Hippocampus', 'Pallidum', 'Putamen', 'Thalamus_Proper'))
-cortical <- grep('vol_', names(df), value=TRUE)[!(grep('vol_', names(df), value=TRUE)
-  %in% subcortical)]
+cortical <- grep('_Vol', names(df), value=TRUE)
 
 df[,c(subcortical, cortical)] <- scale(df[,c(subcortical, cortical)])
 
 long_df <- reshape2::melt(df, c('subject', 'scanner', 'group'),
-  grep('vol_', names(df), value=TRUE))
+  c(grep('vol_', names(df), value=TRUE), grep('_Vol', names(df), value=TRUE)))
 
 getType <- function(i) {
   region <- long_df[i, 'variable']
