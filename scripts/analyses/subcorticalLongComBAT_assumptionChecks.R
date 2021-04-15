@@ -52,18 +52,21 @@ raw_df <- read.csv('~/Documents/nasa_antarctica/NASA/data/dataForLongCombat.csv'
 longraw_df <- reshape2::melt(raw_df, c('subject', 'sex'),
   c('vol_miccai_ave_Accumbens_Area', 'vol_miccai_ave_Amygdala', 'vol_miccai_ave_Caudate',
   'vol_miccai_ave_Hippocampus', 'vol_miccai_ave_Pallidum', 'vol_miccai_ave_Putamen',
-  'vol_miccai_ave_Thalamus_Proper'))
+  'vol_miccai_ave_Thalamus_Proper', 'Temporal_Vol', 'Parietal_Vol', 'Occipital_Vol',
+  'Frontal_Vol'))
 longraw_df$variable <- recode(longraw_df$variable, "vol_miccai_ave_Accumbens_Area"="Accumbens",
     "vol_miccai_ave_Amygdala"="Amygdala", "vol_miccai_ave_Caudate"="Caudate",
     "vol_miccai_ave_Hippocampus"="Hippocampus", "vol_miccai_ave_Pallidum"="Pallidum",
-    "vol_miccai_ave_Putamen"="Putamen", "vol_miccai_ave_Thalamus_Proper"="Thalamus")
+    "vol_miccai_ave_Putamen"="Putamen", "vol_miccai_ave_Thalamus_Proper"="Thalamus",
+    'Temporal_Vol'='Temporal', 'Parietal_Vol'='Parietal', 'Occipital_Vol'='Occipital',
+    'Frontal_Vol'='Frontal')
 
 hist_sex_plot <- ggplot(longraw_df, aes(x=value, fill=sex)) + theme_linedraw() +
   geom_histogram(bins=15) + facet_grid(. ~ variable, scale="free") +
-  labs(x=expression("Volume (mm"^3*")")) +
+  labs(x=expression("Volume (mm"^3*")")) + theme(legend.position='bottom') +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-pdf(file="~/Documents/nasa_antarctica/NASA/plots/sexCheck.pdf", width=8, height=3)
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/sexCheck.pdf", width=10, height=4.2)
 hist_sex_plot
 dev.off()
 
@@ -71,19 +74,29 @@ dev.off()
 longraw_df <- reshape2::melt(raw_df, c('subject', 'age'),
   c('vol_miccai_ave_Accumbens_Area', 'vol_miccai_ave_Amygdala', 'vol_miccai_ave_Caudate',
   'vol_miccai_ave_Hippocampus', 'vol_miccai_ave_Pallidum', 'vol_miccai_ave_Putamen',
-  'vol_miccai_ave_Thalamus_Proper'))
+  'vol_miccai_ave_Thalamus_Proper', 'Temporal_Vol', 'Parietal_Vol', 'Occipital_Vol',
+  'Frontal_Vol'))
 longraw_df$variable <- recode(longraw_df$variable, "vol_miccai_ave_Accumbens_Area"="Accumbens",
     "vol_miccai_ave_Amygdala"="Amygdala", "vol_miccai_ave_Caudate"="Caudate",
     "vol_miccai_ave_Hippocampus"="Hippocampus", "vol_miccai_ave_Pallidum"="Pallidum",
-    "vol_miccai_ave_Putamen"="Putamen", "vol_miccai_ave_Thalamus_Proper"="Thalamus")
+    "vol_miccai_ave_Putamen"="Putamen", "vol_miccai_ave_Thalamus_Proper"="Thalamus",
+    'Temporal_Vol'='Temporal', 'Parietal_Vol'='Parietal', 'Occipital_Vol'='Occipital',
+    'Frontal_Vol'='Frontal')
 
-scatter_age_plot <- ggplot(longraw_df, aes(x=age, y=value, colour=subject)) + theme_linedraw() +
-  geom_point() + facet_grid(variable ~ ., scale="free") +
+subcort_scatter_age_plot <- ggplot(longraw_df[longraw_df$variable %in% subcort, ],
+    aes(x=age, y=value, colour=subject)) +
+  theme_linedraw() + geom_point() + facet_grid(variable ~ ., scale="free") +
   labs(y=expression("Volume (mm"^3*")")) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position='none')
 
-pdf(file="~/Documents/nasa_antarctica/NASA/plots/ageCheck.pdf", width=3, height=7.5)
-scatter_age_plot
+cort_scatter_age_plot <- ggplot(longraw_df[longraw_df$variable %in% cort, ],
+    aes(x=age, y=value, colour=subject)) +
+  theme_linedraw() + geom_point() + facet_grid(variable ~ ., scale="free") +
+  labs(y='') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position='none')
+
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/ageCheck.pdf", width=6, height=7.5)
+cowplot::plot_grid(subcort_scatter_age_plot, cort_scatter_age_plot, labels=c('A', 'B'), ncol=2)
 dev.off()
 
 
@@ -91,18 +104,21 @@ dev.off()
 longraw_df <- reshape2::melt(raw_df, c('subject', 'group'),
   c('vol_miccai_ave_Accumbens_Area', 'vol_miccai_ave_Amygdala', 'vol_miccai_ave_Caudate',
   'vol_miccai_ave_Hippocampus', 'vol_miccai_ave_Pallidum', 'vol_miccai_ave_Putamen',
-  'vol_miccai_ave_Thalamus_Proper'))
+  'vol_miccai_ave_Thalamus_Proper', 'Temporal_Vol', 'Parietal_Vol', 'Occipital_Vol',
+  'Frontal_Vol'))
 longraw_df$variable <- recode(longraw_df$variable, "vol_miccai_ave_Accumbens_Area"="Accumbens",
     "vol_miccai_ave_Amygdala"="Amygdala", "vol_miccai_ave_Caudate"="Caudate",
     "vol_miccai_ave_Hippocampus"="Hippocampus", "vol_miccai_ave_Pallidum"="Pallidum",
-    "vol_miccai_ave_Putamen"="Putamen", "vol_miccai_ave_Thalamus_Proper"="Thalamus")
+    "vol_miccai_ave_Putamen"="Putamen", "vol_miccai_ave_Thalamus_Proper"="Thalamus",
+    'Temporal_Vol'='Temporal', 'Parietal_Vol'='Parietal', 'Occipital_Vol'='Occipital',
+    'Frontal_Vol'='Frontal')
 
 hist_crew_plot <- ggplot(longraw_df, aes(x=value, fill=group)) + theme_linedraw() +
   geom_histogram(bins=15) + facet_grid(. ~ variable, scale="free") +
-  labs(x=expression("Volume (mm"^3*")")) +
+  labs(x=expression("Volume (mm"^3*")")) + theme(legend.position='bottom') +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-pdf(file="~/Documents/nasa_antarctica/NASA/plots/crewCheck.pdf", width=8, height=3)
+pdf(file="~/Documents/nasa_antarctica/NASA/plots/crewCheck.pdf", width=10, height=4.2)
 hist_crew_plot
 dev.off()
 
