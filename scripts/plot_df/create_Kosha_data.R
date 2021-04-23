@@ -1,5 +1,5 @@
 ### This script combines all of the data the Kosha asked for
-### 
+###
 ### Ellyn Butler
 ### December 17, 2018... edited June 1-5, 2019 (previously output without Rest or DTI)
 
@@ -19,7 +19,7 @@ data1 <- makeREDCapFriendly_NASAAntartica(data1)
 ### ---------- Ellyn's Volume ---------- ###
 # Read in the data
 data2 <- read.csv('/home/ebutler/erb_data/nasa/nasa_raw_brain_vol.csv', header=T)
-data2$CGMV<- (data2$FrontOrb_Vol + data2$FrontDors_Vol + data2$Temporal_Vol + data2$Parietal_Vol + data2$Occipital_Vol)*2
+data2$CGMV <- (data2$FrontOrb_Vol + data2$FrontDors_Vol + data2$Temporal_Vol + data2$Parietal_Vol + data2$Occipital_Vol)*2
 
 ### ---------- Hippo ---------- ###
 # Read in the data
@@ -56,15 +56,15 @@ data10 <- data10[,c("subject_1", "Time", "FrontOrb_MD", "FrontDors_MD", "Tempora
 
 ##################### Merge the data #####################
 
-final_data <- merge(data1, data2) 
-final_data <- merge(final_data, data3) 
-final_data <- merge(final_data, data4) 
+final_data <- merge(data1, data2)
+final_data <- merge(final_data, data3)
+final_data <- merge(final_data, data4)
 final_data <- merge(final_data, data5)
-final_data <- merge(final_data, data6) 
-final_data <- merge(final_data, data7) 
-final_data <- merge(final_data, data8) 
+final_data <- merge(final_data, data6)
+final_data <- merge(final_data, data7)
+final_data <- merge(final_data, data8)
 final_data <- merge(final_data, data9)
-final_data <- merge(final_data, data10)  
+final_data <- merge(final_data, data10)
 
 # Rename gray and white matter volume variables
 names(final_data)[names(final_data) == 'CGMV'] <- 'Cortical_Vol'
@@ -144,7 +144,7 @@ for (i in 1:nrow(phantomed_df)) {
 			} else if (phantomed_df[i, "scanner"] == "CHR") {
 				phantomed_df[i, newroi] <- (phantomed_df[i, roi] - phantom_summary[phantom_summary$ROI == roi, "Mean_CHR"])/phantom_summary[phantom_summary$ROI == roi, "SD_CHR"]
 			} else { # HOB
-				phantomed_df[i, newroi] <- (phantomed_df[i, roi] - phantom_summary[phantom_summary$ROI == roi, "Mean_HOB"])/phantom_summary[phantom_summary$ROI == roi, "SD_HOB"]				
+				phantomed_df[i, newroi] <- (phantomed_df[i, roi] - phantom_summary[phantom_summary$ROI == roi, "Mean_HOB"])/phantom_summary[phantom_summary$ROI == roi, "SD_HOB"]
 			}
 		}
 	}
@@ -154,31 +154,3 @@ for (i in 1:nrow(phantomed_df)) {
 ##################### Write the data #####################
 
 write.csv(phantomed_df, file='/home/ebutler/erb_data/nasa/nasa_strucRestDTI_KoshaTaki.csv', row.names=F)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
