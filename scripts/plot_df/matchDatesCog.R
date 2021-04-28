@@ -34,7 +34,7 @@ findClosestDate <- function(i) {
 }
 
 calcEfficiency <- function(test) {
-  rowMeans(tmp_df[, c(paste0(test, '_ACC'), paste0(test, '_RT'))])
+  rowMeans(final_df[, c(paste0(test, '_ACC'), paste0(test, '_RT'))])
 }
 
 ################################################################################
@@ -43,12 +43,15 @@ calcEfficiency <- function(test) {
 demo_df$Battery <- sapply(1:nrow(demo_df), findClosestDate)
 
 # Rename columns
+names(cog_df) <- gsub('Accuracy', 'ACC', names(cog_df))
 names(cog_df) <- gsub('pCorr', 'ACC', names(cog_df))
 names(cog_df) <- gsub('AvRT', 'RT', names(cog_df))
+names(cog_df) <- gsub('MeanRT', 'RT', names(cog_df))
 
 tests <- c('MP', 'PVT', 'VOLT', 'NBCK', 'AM', 'LOT', 'ERT', 'MRT', 'DSST')
 acc_vars <- paste0(tests, '_ACC')
 rt_vars <- paste0(tests, '_RT')
+eff_vars <- paste0(tests, '_EFF')
 
 # Merge dataframes
 final_df <- merge(demo_df[, c('subject', 'Time', 'Battery')],
@@ -61,13 +64,21 @@ final_df[, rt_vars] <- lapply(final_df[, rt_vars], scale)
 
 # Calculate efficiency
 final_df[, paste0('neg_', rt_vars)] <- lapply(final_df[, rt_vars], '*', -1)
-tmp_df[, paste0(tests_acc, '_EFF')] <- sapply(tests_acc, calcEfficiency)
+final_df[, eff_vars] <- sapply(tests, calcEfficiency)
+final_df[, eff_vars] <- lapply(final_df[, eff_vars], scale)
 
 # Calculate accuracy, RT and efficiency
 final_df$Accuracy <- rowMeans(final_df[, acc_vars])
 final_df$Accuracy <- scale(final_df$Accuracy)
 
+final_df$Speed <- rowMeans(final_df[, rt_vars])
+final_df$Speed <- scale(final_df$Speed)
 
+final_df$Efficiency <- rowMeans(final_df[, eff_vars])
+final_df$Efficiency <- scale(final_df$Efficiency)
+
+# Write out data
+write.csv(final_df, '~/Documents/nasa_antarctica/NASA/data/concordia_cognition_data_cleaned.csv')
 
 
 
