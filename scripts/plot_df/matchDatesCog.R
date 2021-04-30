@@ -34,7 +34,7 @@ findClosestDate <- function(i) {
 }
 
 calcEfficiency <- function(test) {
-  rowMeans(final_df[, c(paste0(test, '_ACC'), paste0(test, '_RT'))])
+  rowMeans(final_df[, c(paste0(test, '_ACC'), paste0('neg_', test, '_RT'))])
 }
 
 ################################################################################
@@ -78,7 +78,7 @@ final_df$Efficiency <- rowMeans(final_df[, eff_vars])
 final_df$Efficiency <- scale(final_df$Efficiency)
 
 # Write out data
-write.csv(final_df, '~/Documents/nasa_antarctica/NASA/data/concordia_cognition_data_cleaned.csv')
+write.csv(final_df, '~/Documents/nasa_antarctica/NASA/data/concordia_cognition_data_cleaned.csv', row.names=FALSE)
 
 
 
