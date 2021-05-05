@@ -7,6 +7,8 @@
 ### April 19, 2021: Try recoding time as a factor for ComBat. Joanne says R
 ###   will create indicators internally for time, and that way I can use the time
 ###   argument in the most recent version of longCombat
+### May 5, 2021: Found a mistake in the order of cortical results. Temporal lobe
+###   actually has the significant t18 effect
 
 library('miceadds') # v 3.10-28... 3.11-6
 library('ggplot2') # v 3.3.2
@@ -51,7 +53,7 @@ subcortical <- c("vol_miccai_ave_Accumbens_Area", "vol_miccai_ave_Amygdala",
   "vol_miccai_ave_Putamen", "vol_miccai_ave_Thalamus_Proper")
 vol_df$Frontal_Vol <- vol_df$FrontOrb_Vol + vol_df$FrontDors_Vol
 vol_df <- vol_df[, !(names(vol_df) %in% c("FrontOrb_Vol", "FrontDors_Vol"))]
-cortical <- grep("_Vol", names(vol_df), value=TRUE)[!(grep("_Vol", names(vol_df), value=TRUE) %in% c("BasGang_Vol", "Limbic_Vol"))]
+cortical <- c("Frontal_Vol", "Parietal_Vol", "Temporal_Vol", "Occipital_Vol")
 vol_df <- vol_df[, c("subject", "Time", "scanner", "group", subcortical, cortical)]
   #grep("_ave_", names(vol_df), value=TRUE)
 
@@ -143,6 +145,9 @@ for (i in 1:nrow(crew_df)) {
 crew_df$ScannerOrder <- ordered(crew_df$ScannerOrder, c("CGN-HOB-CGN", "CGN-HOB",
   "CGN-CHR-CGN", "CGN-CHR", "CGN", "CHR-CGN", "HOB-CHR", "HOB-CGN"))
 
+subcort <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus", "Pallidum",
+  "Putamen", "Thalamus")
+cort <- c("Frontal", "Parietal", "Temporal", "Occipital")
 crew_combat_df <- crew_df[crew_df$Region %in% grep("combat", crew_df$Region, value=TRUE),]
 crew_combat_df$Region <- recode(crew_combat_df$Region,
     "perbase_combat_vol_miccai_ave_Accumbens_Area"="Accumbens",
@@ -153,9 +158,10 @@ crew_combat_df$Region <- recode(crew_combat_df$Region,
     "perbase_combat_vol_miccai_ave_Putamen"="Putamen",
     "perbase_combat_vol_miccai_ave_Thalamus_Proper"="Thalamus",
     "perbase_combat_Frontal_Vol"="Frontal",
-    "perbase_combat_Temporal_Vol"="Temporal",
     "perbase_combat_Parietal_Vol"="Parietal",
+    "perbase_combat_Temporal_Vol"="Temporal",
     "perbase_combat_Occipital_Vol"="Occipital")
+crew_combat_df$Region <- ordered(crew_combat_df$Region, c(subcort, cort))
 
 crew_raw_df <- crew_df[!(crew_df$Region %in% grep("combat",
   crew_df$Region, value=TRUE)),]
@@ -168,13 +174,11 @@ crew_raw_df$Region <- recode(crew_raw_df$Region,
     "perbase_vol_miccai_ave_Putamen"="Putamen",
     "perbase_vol_miccai_ave_Thalamus_Proper"="Thalamus",
     "perbase_Frontal_Vol"="Frontal",
-    "perbase_Temporal_Vol"="Temporal",
     "perbase_Parietal_Vol"="Parietal",
+    "perbase_Temporal_Vol"="Temporal",
     "perbase_Occipital_Vol"="Occipital")
+crew_raw_df$Region <- ordered(crew_combat_df$Region, c(subcort, cort))
 
-subcort <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus", "Pallidum",
-  "Putamen", "Thalamus")
-cort <- c("Frontal", "Temporal", "Parietal", "Occipital")
 for (type in c("subcort", "cort")) {
   crew_combat_plot <- ggplot(crew_combat_df[crew_combat_df$Region %in% get(type), ],
       aes(x=Time, y=PercentBase, color=ScannerOrder, group=CrewMember)) +
@@ -249,6 +253,8 @@ crew_values_df$Region <- recode(crew_values_df$Region,
     "combat_Parietal_Vol"="Parietal",
     "combat_Occipital_Vol"="Occipital")
 
+crew_values_df$Region <- ordered(crew_values_df$Region, c(subcort, cort))
+
 subcort_crew_values_plot <- ggplot(crew_values_df[crew_values_df$Region %in% subcort, ],
       aes(x=Time, y=Values, color=ScannerOrder, group=CrewMember)) +
     theme_linedraw() + geom_line() + facet_grid(DataType ~ Region, scales="free_y") +
@@ -273,49 +279,47 @@ dev.off()
 
 ################################### Model ###################################
 
-simp <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
-  "Pallidum", "Putamen", "Thalamus", "Frontal", "Temporal", "Parietal", "Occipital")
-results <- data.frame(Region=simp, LongCombat_Coef_t12=rep(NA, length(simp)),
-  LongCombat_P_t12=rep(NA, length(simp)), LongCombat_Coef_t18=rep(NA, length(simp)),
-  LongCombat_P_t18=rep(NA, length(simp)), FixedScan_Coef_t12=rep(NA, length(simp)),
-  FixedScan_P_t12=rep(NA, length(simp)), FixedScan_Coef_t18=rep(NA, length(simp)),
-  FixedScan_P_t18=rep(NA, length(simp)), IndT_MeanDiff_t12=rep(NA, length(simp)),
-  IndT_P_t12=rep(NA, length(simp)), IndT_MeanDiff_t18=rep(NA, length(simp)),
-  IndT_P_t18=rep(NA, length(simp)))
+simps <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
+  "Pallidum", "Putamen", "Thalamus", "Frontal", "Parietal", "Temporal", "Occipital")
+results <- data.frame(Region=simps, LongCombat_Coef_t12=rep(NA, length(simps)),
+  LongCombat_P_t12=rep(NA, length(simps)), LongCombat_Coef_t18=rep(NA, length(simps)),
+  LongCombat_P_t18=rep(NA, length(simps)), FixedScan_Coef_t12=rep(NA, length(simps)),
+  FixedScan_P_t12=rep(NA, length(simps)), FixedScan_Coef_t18=rep(NA, length(simps)),
+  FixedScan_P_t18=rep(NA, length(simps)), IndT_MeanDiff_t12=rep(NA, length(simps)),
+  IndT_P_t12=rep(NA, length(simps)), IndT_MeanDiff_t18=rep(NA, length(simps)),
+  IndT_P_t18=rep(NA, length(simps)))
+
+all_data_tmp <- all_data
+
+all_data_tmp <- rename(all_data_tmp, "Accumbens"="combat_vol_miccai_ave_Accumbens_Area",
+  "Amygdala"="combat_vol_miccai_ave_Amygdala", "Caudate"="combat_vol_miccai_ave_Caudate",
+  "Hippocampus"="combat_vol_miccai_ave_Hippocampus", "Pallidum"="combat_vol_miccai_ave_Pallidum",
+  "Putamen"="combat_vol_miccai_ave_Putamen", "Thalamus"="combat_vol_miccai_ave_Thalamus_Proper",
+  "Frontal"="combat_Frontal_Vol", "Temporal"="combat_Temporal_Vol",
+  "Parietal"="combat_Parietal_Vol", "Occipital"="combat_Occipital_Vol")
 
 ######### Model with Combat Data #########
 
-
-for (i in 1:length(c(subcortical, cortical))) {
-  region <- paste0("combat_", c(subcortical, cortical))[i]
-  names(all_data)[names(all_data) == region] <- simp[i]
-
-  time2_mod <- lmer(formula(paste(simp[i], "~ (1|subject) + t12")), data=all_data)
-  time23_mod <- lmer(formula(paste(simp[i], "~ (1|subject) + t12 + t18")), data=all_data)
-  time3_mod <- lmer(formula(paste(simp[i], "~ (1|subject) + t18")), data=all_data)
-  assign(paste0(region, "_time23_mod"), time23_mod)
-
-  names(all_data)[names(all_data) == simp[i]] <- region
+for (simp in simps) {
+  time2_mod <- lmer(formula(paste(simp, "~ (1|subject) + t12")), data=all_data_tmp)
+  time23_mod <- lmer(formula(paste(simp, "~ (1|subject) + t12 + t18")), data=all_data_tmp)
+  time3_mod <- lmer(formula(paste(simp, "~ (1|subject) + t18")), data=all_data_tmp)
+  assign(paste0(simp, "_time23_mod"), time23_mod)
 
   ## Test if adding in Time 2 explains additional variance in within subject variability
-  results[i, "LongCombat_P_t12"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
-  results[i, "LongCombat_Coef_t12"] <- time23_mod@beta[2]
+  results[results$Region == simp, "LongCombat_P_t12"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
+  results[results$Region == simp, "LongCombat_Coef_t12"] <- time23_mod@beta[2]
 
   ## Test if adding in Time 3 explains additional variance in within subject variability
-  results[i, "LongCombat_P_t18"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
-  results[i, "LongCombat_Coef_t18"] <- time23_mod@beta[3]
+  results[results$Region == simp, "LongCombat_P_t18"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
+  results[results$Region == simp, "LongCombat_Coef_t18"] <- time23_mod@beta[3]
 }
 
-print(tab_model(combat_vol_miccai_ave_Accumbens_Area_time23_mod,
-  combat_vol_miccai_ave_Amygdala_time23_mod,
-  combat_vol_miccai_ave_Caudate_time23_mod,
-  combat_vol_miccai_ave_Hippocampus_time23_mod,
-  combat_vol_miccai_ave_Pallidum_time23_mod,
-  combat_vol_miccai_ave_Putamen_time23_mod,
-  combat_vol_miccai_ave_Thalamus_Proper_time23_mod,
-  combat_Frontal_Vol_time23_mod, combat_Parietal_Vol_time23_mod,
-  combat_Occipital_Vol_time23_mod, combat_Temporal_Vol_time23_mod, show.ci=FALSE,
-  p.val='kr', p.adjust='fdr', file="~/Documents/nasa_antarctica/NASA/tables/lmeTable.html"))
+print(tab_model(Accumbens_time23_mod, Amygdala_time23_mod, Caudate_time23_mod,
+  Hippocampus_time23_mod, Pallidum_time23_mod, Putamen_time23_mod,
+  Thalamus_time23_mod, Frontal_time23_mod, Parietal_time23_mod, Temporal_time23_mod,
+  Occipital_time23_mod, show.ci=FALSE, p.val='kr', p.adjust='fdr',
+  file="~/Documents/nasa_antarctica/NASA/tables/lmeTable_combat.html"))
 
 
 
@@ -323,24 +327,35 @@ print(tab_model(combat_vol_miccai_ave_Accumbens_Area_time23_mod,
 
 #fe_data <- tmp_data # This includes phantoms, which should not be in the final analysis
 
-for (i in 1:length(c(subcortical, cortical))) {
-  region <- c(subcortical, cortical)[i]
-  # October 30, 2020: Switched analyses to match paper, i.e., excluded phantoms
-  # and group indicator
-  time2_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12")), data=all_data) #Include "1 +"?
-  time23_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t12 + t18")), data=all_data)
-  time3_mod <- lmer(formula(paste(region, "~ 1 + (1|subject) + t18")), data=all_data)
+all_data_raw <- all_data
+all_data_raw <- rename(all_data_raw, "Accumbens"="vol_miccai_ave_Accumbens_Area",
+  "Amygdala"="vol_miccai_ave_Amygdala", "Caudate"="vol_miccai_ave_Caudate",
+  "Hippocampus"="vol_miccai_ave_Hippocampus", "Pallidum"="vol_miccai_ave_Pallidum",
+  "Putamen"="vol_miccai_ave_Putamen", "Thalamus"="vol_miccai_ave_Thalamus_Proper",
+  "Frontal"="Frontal_Vol", "Temporal"="Temporal_Vol", "Parietal"="Parietal_Vol",
+  "Occipital"="Occipital_Vol")
+
+for (simp in simps) {
+  time2_mod <- lmer(formula(paste(simp, "~ (1|subject) + t12 + scanner")), data=all_data_raw)
+  time23_mod <- lmer(formula(paste(simp, "~ (1|subject) + t12 + t18 + scanner")), data=all_data_raw)
+  time3_mod <- lmer(formula(paste(simp, "~ (1|subject) + t18 + scanner")), data=all_data_raw)
+  assign(paste0(simp, "_time23_mod_rc"), time23_mod)
 
   ## Test if adding in Time 2 explains additional variance in within subject variability
-  results[i, "FixedScan_P_t12"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
-  results[i, "FixedScan_Coef_t12"] <- time23_mod@beta[2]
+  results[results$Region == simp, "FixedScan_P_t12"] <- KRmodcomp(time23_mod, time3_mod)$stats$p.value
+  results[results$Region == simp, "FixedScan_Coef_t12"] <- time23_mod@beta[2]
 
   ## Test if adding in Time 3 explains additional variance in within subject variability
-  results[i, "FixedScan_P_t18"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
-  results[i, "FixedScan_Coef_t18"] <- time23_mod@beta[3]
+  results[results$Region == simp, "FixedScan_P_t18"] <- KRmodcomp(time23_mod, time2_mod)$stats$p.value
+  results[results$Region == simp, "FixedScan_Coef_t18"] <- time23_mod@beta[3]
 }
 
-results <- results[, 1:9]
+print(tab_model(Accumbens_time23_mod_rc, Amygdala_time23_mod_rc, Caudate_time23_mod_rc,
+  Hippocampus_time23_mod_rc, Pallidum_time23_mod_rc, Putamen_time23_mod_rc,
+  Thalamus_time23_mod_rc, Frontal_time23_mod_rc, Parietal_time23_mod_rc, Temporal_time23_mod_rc,
+  Occipital_time23_mod_rc, show.ci=FALSE, p.val='kr', p.adjust='fdr',
+  file="~/Documents/nasa_antarctica/NASA/tables/lmeTable_rawscancov.html"))
+
 
 write.csv(results, file='~/Documents/nasa_antarctica/NASA/data/results/longCombat_vs_FixedScanner.csv', row.names=FALSE)
 
@@ -357,10 +372,6 @@ longcombat_results$P_FDR_NegLog10 <- -log10(longcombat_results$P_FDR)
 
 longcombat_results_old <- longcombat_results
 
-######### Independent Samples T-tests #########
-
-ind_data <- ind_data[, c("subject", "Time", "scanner", "group", subcortical)]
-# TO DO
 
 ########################### Subcortical Brain Figure ###########################
 

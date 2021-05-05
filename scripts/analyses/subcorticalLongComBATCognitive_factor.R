@@ -45,7 +45,7 @@ subcortical <- c("vol_miccai_ave_Accumbens_Area", "vol_miccai_ave_Amygdala",
   "vol_miccai_ave_Putamen", "vol_miccai_ave_Thalamus_Proper")
 vol_df$Frontal_Vol <- vol_df$FrontOrb_Vol + vol_df$FrontDors_Vol
 vol_df <- vol_df[, !(names(vol_df) %in% c("FrontOrb_Vol", "FrontDors_Vol"))]
-cortical <- grep("_Vol", names(vol_df), value=TRUE)[!(grep("_Vol", names(vol_df), value=TRUE) %in% c("BasGang_Vol", "Limbic_Vol"))]
+cortical <- c("Frontal_Vol", "Temporal_Vol", "Parietal_Vol", "Occipital_Vol")
 vol_df <- vol_df[, c("subject", "Time", "scanner", "group", subcortical, cortical)]
 
 # Subset params
@@ -84,18 +84,15 @@ final_df$Efficiency <- scale(final_df$Efficiency)
 final_df <- final_df[!is.na(final_df$Accuracy), ]
 row.names(final_df) <- 1:nrow(final_df)
 
-################################### Plot ###################################
-
 crew_phan_df <- final_df[final_df$group %in% c("Crew", "Phantom"), ]
 row.names(crew_phan_df) <- 1:nrow(crew_phan_df)
 crew_phan_df$Crew <- recode(crew_phan_df$group, "Crew"=1, "Phantom"=0)
 crew_phan_df$t12 <- recode(crew_phan_df$Time, "t0"=0, "t12"=1, "t18"=0)
 crew_phan_df$t18 <- recode(crew_phan_df$Time, "t0"=0, "t12"=0, "t18"=1)
 
-write.csv(crew_phan_df, '~/Documents/nasa_antarctica/NASA/data/dataForLongCombat.csv', row.names=FALSE)
-
 crew_phan_df$Time <- as.factor(crew_phan_df$Time)
 
+# Apply ComBat
 mod1_acc <- longCombat(idvar="subject", batchvar="scanner",
  features=c(subcortical, cortical), timevar="Time", formula="Time*Accuracy",
  ranef="(1|subject)", data=crew_phan_df)
@@ -111,41 +108,27 @@ tmp_data <- all_data
 all_data <- all_data[all_data$group == "Crew",]
 row.names(all_data) <- 1:nrow(all_data)
 
-#write.csv(all_data, paste0("~/Documents/nasa_antarctica/NASA/data/longCombatCrewCog_", Sys.Date(), ".csv"), row.names=FALSE)
-
 
 ################################### Model ###################################
 
-simp <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus",
-  "Pallidum", "Putamen", "Thalamus", "Frontal", "Temporal", "Parietal", "Occipital")
-results <- data.frame(Region=simp, LongCombat_Coef_t12=rep(NA, length(simp)),
-  LongCombat_P_t12=rep(NA, length(simp)), LongCombat_Coef_t18=rep(NA, length(simp)),
-  LongCombat_P_t18=rep(NA, length(simp)), FixedScan_Coef_t12=rep(NA, length(simp)),
-  FixedScan_P_t12=rep(NA, length(simp)), FixedScan_Coef_t18=rep(NA, length(simp)),
-  FixedScan_P_t18=rep(NA, length(simp)), IndT_MeanDiff_t12=rep(NA, length(simp)),
-  IndT_P_t12=rep(NA, length(simp)), IndT_MeanDiff_t18=rep(NA, length(simp)),
-  IndT_P_t18=rep(NA, length(simp)))
+simps <- c("Accumbens", "Amygdala", "Caudate", "Hippocampus", "Pallidum",
+  "Putamen", "Thalamus", "Frontal", "Parietal", "Temporal", "Occipital")
 
-######### Model with Combat Data #########
+all_data <- rename(all_data, "Accumbens"="combat_vol_miccai_ave_Accumbens_Area",
+  "Amygdala"="combat_vol_miccai_ave_Amygdala", "Caudate"="combat_vol_miccai_ave_Caudate",
+  "Hippocampus"="combat_vol_miccai_ave_Hippocampus", "Pallidum"="combat_vol_miccai_ave_Pallidum",
+  "Putamen"="combat_vol_miccai_ave_Putamen", "Thalamus"="combat_vol_miccai_ave_Thalamus_Proper",
+  "Frontal"="combat_Frontal_Vol", "Temporal"="combat_Temporal_Vol",
+  "Parietal"="combat_Parietal_Vol", "Occipital"="combat_Occipital_Vol")
 
-
-for (i in 1:length(c(subcortical, cortical))) {
-  region <- paste0("combat_", c(subcortical, cortical))[i]
-  names(all_data)[names(all_data) == region] <- simp[i]
-  cog_mod <- lmer(formula(paste(simp[i], "~ (1|subject) + t12 + t18 + Accuracy + t12:Accuracy + t18:Accuracy")), data=all_data)
-
-  assign(paste0(region, "_cog_mod"), cog_mod)
+for (simp in simps) {
+  cog_mod <- lmer(formula(paste(simp, "~ (1|subject) + t12 + t18 + Accuracy + t12:Accuracy + t18:Accuracy")), data=all_data)
+  assign(paste0(simp, "_cog_mod"), cog_mod)
 }
 
-print(tab_model(combat_vol_miccai_ave_Accumbens_Area_cog_mod,
-  combat_vol_miccai_ave_Amygdala_cog_mod,
-  combat_vol_miccai_ave_Caudate_cog_mod,
-  combat_vol_miccai_ave_Hippocampus_cog_mod,
-  combat_vol_miccai_ave_Pallidum_cog_mod,
-  combat_vol_miccai_ave_Putamen_cog_mod,
-  combat_vol_miccai_ave_Thalamus_Proper_cog_mod,
-  combat_Frontal_Vol_time23_mod, combat_Parietal_Vol_cog_mod,
-  combat_Occipital_Vol_time23_mod, combat_Temporal_Vol_cog_mod, show.ci=FALSE,
+print(tab_model(Accumbens_cog_mod, Amygdala_cog_mod, Caudate_cog_mod,
+  Hippocampus_cog_mod, Pallidum_cog_mod, Putamen_cog_mod, Thalamus_cog_mod,
+  Frontal_cog_mod, Parietal_cog_mod, Temporal_cog_mod, Occipital_cog_mod, show.ci=FALSE,
   p.val='kr', p.adjust='fdr', file="~/Documents/nasa_antarctica/NASA/tables/lmeTable_cog.html"))
 
 
